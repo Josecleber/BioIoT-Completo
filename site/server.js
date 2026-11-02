@@ -37,6 +37,78 @@ db.serialize(() => {
 let ultimaConexaoESP = null;
 let estadosUI = {};
 
+const estatisticasComunicacao = {
+    heartbeatsRecebidos: 0,
+    medicoesRecebidas: 0,
+    medicoesAceitas: 0,
+    medicoesRejeitadas: 0,
+    estadosInterface: 0,
+    leiturasGravadas: 0,
+    falhasBanco: 0,
+    intervalosHeartbeatMs: [],
+    ultimoHeartbeat: null
+};
+
+// Métricas reais do processo Node.js que executa o BioIoT
+const os = require('os');
+
+let cpuAnterior = process.cpuUsage();
+let instanteAnterior = process.hrtime.bigint();
+
+app.get('/api/desempenho', (req, res) => {
+    const agora = process.hrtime.bigint();
+    const cpuAtual = process.cpuUsage();
+
+    const tempoDecorridoUs = Number(agora - instanteAnterior) / 1000;
+
+    const cpuConsumidoUs =
+        (cpuAtual.user - cpuAnterior.user) +
+        (cpuAtual.system - cpuAnterior.system);
+
+    // Percentual equivalente a um núcleo de CPU.
+    const cpuPercentual = tempoDecorridoUs > 0
+        ? (cpuConsumidoUs / tempoDecorridoUs) * 100
+        : 0;
+
+    cpuAnterior = cpuAtual;
+    instanteAnterior = agora;
+
+    const memoria = process.memoryUsage();
+
+    res.json({
+        timestamp: new Date().toISOString(),
+
+        origem: 'Processo Node.js no container Docker',
+
+        cpu: {
+            percentual: Number(cpuPercentual.toFixed(2)),
+            unidade: 'percentual de um nucleo'
+        },
+
+        memoria: {
+            rssMB: Number((memoria.rss / 1024 / 1024).toFixed(2)),
+            heapUsadoMB: Number((memoria.heapUsed / 1024 / 1024).toFixed(2)),
+            heapTotalMB: Number((memoria.heapTotal / 1024 / 1024).toFixed(2))
+        },
+
+        sistema: {
+            uptimeSegundos: Math.floor(process.uptime()),
+            nucleosVisiveis: os.cpus().length,
+            plataforma: process.platform,
+            arquitetura: process.arch
+        },
+
+        esp32: {
+            online: ultimaConexaoESP !== null &&
+                Date.now() - ultimaConexaoESP < 10000,
+
+            ultimaComunicacaoSegundos: ultimaConexaoESP === null
+                ? null
+                : Math.floor((Date.now() - ultimaConexaoESP) / 1000)
+        }
+    });
+});
+
 // Recebe periodicamente o sinal de vida do ESP32
 app.post('/api/heartbeat', (req, res) => {
     const { dispositivo } = req.body;
@@ -47,7 +119,23 @@ app.post('/api/heartbeat', (req, res) => {
         });
     }
 
-    ultimaConexaoESP = Date.now();
+    const agoraHeartbeat = Date.now();
+
+    if (estatisticasComunicacao.ultimoHeartbeat !== null) {
+        const intervalo =
+            agoraHeartbeat - estatisticasComunicacao.ultimoHeartbeat;
+
+        estatisticasComunicacao.intervalosHeartbeatMs.push(intervalo);
+
+        // Mantém os últimos 100 intervalos
+        if (estatisticasComunicacao.intervalosHeartbeatMs.length > 100) {
+            estatisticasComunicacao.intervalosHeartbeatMs.shift();
+        }
+    }
+
+    estatisticasComunicacao.heartbeatsRecebidos++;
+    estatisticasComunicacao.ultimoHeartbeat = agoraHeartbeat;
+    ultimaConexaoESP = agoraHeartbeat;
 
     res.status(200).json({
         status: 'online',
@@ -65,6 +153,55 @@ app.get('/api/status-esp', (req, res) => {
     res.json({ online });
 });
 
+
+app.get('/api/estatisticas-comunicacao', (req, res) => {
+    const intervalos = estatisticasComunicacao.intervalosHeartbeatMs;
+
+    const mediaIntervalo = intervalos.length
+        ? intervalos.reduce((total, valor) => total + valor, 0) /
+        intervalos.length
+        : null;
+
+    const maximoIntervalo = intervalos.length
+        ? Math.max(...intervalos)
+        : null;
+
+    res.json({
+        origem: 'Requisicoes recebidas pelo servidor BioIoT',
+
+        inicioSessao: new Date(
+            Date.now() - process.uptime() * 1000
+        ).toISOString(),
+
+        heartbeats: {
+            recebidos: estatisticasComunicacao.heartbeatsRecebidos,
+            ultimoRecebimento: estatisticasComunicacao.ultimoHeartbeat
+                ? new Date(estatisticasComunicacao.ultimoHeartbeat).toISOString()
+                : null,
+            intervaloMedioMs: mediaIntervalo === null
+                ? null
+                : Number(mediaIntervalo.toFixed(2)),
+            intervaloMaximoMs: maximoIntervalo,
+            intervalosAnalisados: intervalos.length
+        },
+
+        medicoes: {
+            recebidas: estatisticasComunicacao.medicoesRecebidas,
+            aceitas: estatisticasComunicacao.medicoesAceitas,
+            rejeitadas: estatisticasComunicacao.medicoesRejeitadas,
+            estadosInterface: estatisticasComunicacao.estadosInterface,
+            leiturasGravadas: estatisticasComunicacao.leiturasGravadas,
+            falhasBanco: estatisticasComunicacao.falhasBanco
+        },
+
+        esp32: {
+            online: ultimaConexaoESP !== null &&
+                Date.now() - ultimaConexaoESP < 10000
+        }
+    });
+});
+
+
 app.get('/api/pacientes', (req, res) => {
     db.all(`SELECT * FROM pacientes`, [], (err, rows) => {
         if (err) return res.status(500).json({ erro: err.message });
@@ -74,6 +211,7 @@ app.get('/api/pacientes', (req, res) => {
 
 app.post('/api/dados', (req, res) => {
     const { dispositivo, bpm, spo2 } = req.body;
+    estatisticasComunicacao.medicoesRecebidas++;
 
     const dispositivoValido =
         typeof dispositivo === 'string' &&
@@ -93,6 +231,7 @@ app.post('/api/dados', (req, res) => {
         spo2 <= 100;
 
     if (!dispositivoValido || (!estadoEspecial && !leituraValida)) {
+        estatisticasComunicacao.medicoesRejeitadas++;
         return res.status(400).json({
             erro: 'Dispositivo, BPM ou SpO2 inválidos'
         });
@@ -102,7 +241,10 @@ app.post('/api/dados', (req, res) => {
 
     // Comando de interface
     if (bpm <= 0) {
-        estadosUI[dispositivo] = { bpm, spo2 }; // Guarda estado temporário apenas na RAM
+        estatisticasComunicacao.medicoesAceitas++;
+        estatisticasComunicacao.estadosInterface++;
+
+        estadosUI[dispositivo] = { bpm, spo2 };
         console.log(`[UI] Disp: ${dispositivo} | Estado: ${bpm === 0 ? 'Sem dedo' : 'A calcular'}`);
         return res.status(201).json({ status: 'Estado da interface atualizado' });
     }
@@ -116,10 +258,15 @@ app.post('/api/dados', (req, res) => {
 
     db.run(query, [dispositivo, bpm, spo2], function (err) {
         if (err) {
+            estatisticasComunicacao.falhasBanco++;
+
             return res.status(500).json({
                 erro: err.message
             });
         }
+
+        estatisticasComunicacao.medicoesAceitas++;
+        estatisticasComunicacao.leiturasGravadas++;
 
         // Mantém em memória a última leitura válida recebida.
         // O horário vem do servidor, não do relógio do navegador.
