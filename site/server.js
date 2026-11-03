@@ -1,9 +1,9 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+const { randomUUID } = require('crypto');
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,10 +32,47 @@ db.serialize(() => {
         spo2 INTEGER NOT NULL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
+    // Migração: identifica o paciente nas novas medições.
+    // Registros antigos permanecem com paciente_id = NULL.
+    db.all('PRAGMA table_info(leituras)', [], (err, colunas) => {
+        if (err) {
+            console.error('Erro ao verificar estrutura de leituras:', err.message);
+            return;
+        }
+
+        const possuiPacienteId = colunas.some(
+            coluna => coluna.name === 'paciente_id'
+        );
+
+        if (!possuiPacienteId) {
+            db.run(
+                'ALTER TABLE leituras ADD COLUMN paciente_id INTEGER REFERENCES pacientes(id)',
+                err => {
+                    if (err) {
+                        console.error('Erro na migração de pacientes:', err.message);
+                    } else {
+                        console.log('Coluna paciente_id adicionada à tabela leituras.');
+                    }
+                }
+            );
+        }
+    });
 });
 
 let ultimaConexaoESP = null;
 let estadosUI = {};
+
+const pacientesEmMonitoramento = new Map();
+
+const sessoesEmMonitoramento = new Map();
+
+const sensoresComDedoRemovido = new Set();
+
+const ultimaConfirmacaoSemDedo = new Map();
+
+const ultimoEncerramentoMonitoramento = new Map();
+
+const TEMPO_MAXIMO_SENSOR_LIVRE_MS = 15000;
 
 const estatisticasComunicacao = {
     heartbeatsRecebidos: 0,
@@ -201,6 +238,132 @@ app.get('/api/estatisticas-comunicacao', (req, res) => {
     });
 });
 
+app.post('/api/monitoramento/iniciar', (req, res) => {
+    const pacienteId = Number(req.body?.pacienteId);
+
+    if (!Number.isSafeInteger(pacienteId) || pacienteId <= 0) {
+        return res.status(400).json({
+            erro: 'ID do paciente inválido.'
+        });
+    }
+
+    db.get(
+        'SELECT id, nome, idade, dispositivo FROM pacientes WHERE id = ?',
+        [pacienteId],
+        (err, paciente) => {
+            if (err) {
+                return res.status(500).json({
+                    erro: 'Erro ao consultar paciente.'
+                });
+            }
+
+            if (!paciente) {
+                return res.status(404).json({
+                    erro: 'Paciente não encontrado.'
+                });
+            }
+
+
+            const dispositivo = paciente.dispositivo;
+            const pacienteAtualId = pacientesEmMonitoramento.get(dispositivo);
+
+            // Impede trocar de paciente sem encerrar o monitoramento anterior.
+            if (pacienteAtualId !== undefined) {
+                if (pacienteAtualId === paciente.id) {
+                    return res.json({
+                        status: 'monitoramento_ja_ativo',
+                        paciente
+                    });
+                }
+
+                return res.status(409).json({
+                    erro: 'Já existe um paciente em monitoramento neste ESP32. Encerre o monitoramento anterior antes de selecionar outra pessoa.'
+                });
+            }
+
+            const agora = Date.now();
+            const ultimaConfirmacao = ultimaConfirmacaoSemDedo.get(dispositivo);
+            const ultimoEncerramento =
+                ultimoEncerramentoMonitoramento.get(dispositivo) ?? 0;
+
+            const confirmacaoRecente =
+                ultimaConfirmacao !== undefined &&
+                agora - ultimaConfirmacao <= TEMPO_MAXIMO_SENSOR_LIVRE_MS;
+
+            const confirmacaoPosteriorAoEncerramento =
+                ultimaConfirmacao !== undefined &&
+                ultimaConfirmacao > ultimoEncerramento;
+
+            if (
+                !sensoresComDedoRemovido.has(dispositivo) ||
+                !confirmacaoRecente ||
+                !confirmacaoPosteriorAoEncerramento
+            ) {
+                return res.status(409).json({
+                    erro: 'Aguarde uma nova confirmação de dedo removido do ESP32 antes de iniciar o monitoramento.'
+                });
+            }
+
+            const sessaoId = randomUUID();
+
+            pacientesEmMonitoramento.set(dispositivo, paciente.id);
+            sessoesEmMonitoramento.set(dispositivo, sessaoId);
+
+            delete estadosUI[dispositivo];
+
+            res.json({
+                status: 'monitoramento_iniciado',
+                paciente,
+                sessaoId
+            });
+
+        }
+    );
+});
+
+app.post('/api/monitoramento/encerrar', (req, res) => {
+    const { dispositivo } = req.body || {};
+
+    if (typeof dispositivo !== 'string' || !dispositivo.trim()) {
+        return res.status(400).json({
+            erro: 'Dispositivo inválido.'
+        });
+    }
+
+    pacientesEmMonitoramento.delete(dispositivo);
+    sessoesEmMonitoramento.delete(dispositivo);
+    ultimoEncerramentoMonitoramento.set(dispositivo, Date.now());
+    sensoresComDedoRemovido.delete(dispositivo);
+    delete estadosUI[dispositivo];
+
+    res.json({
+        status: 'monitoramento_encerrado',
+        dispositivo
+    });
+});
+
+app.get('/api/monitoramento/:dispositivo', (req, res) => {
+    const dispositivo = req.params.dispositivo;
+    const pacienteId = pacientesEmMonitoramento.get(dispositivo);
+
+    res.json({
+        dispositivo,
+        pacienteId: pacienteId ?? null,
+        ativo: pacienteId !== undefined
+    });
+});
+
+app.get('/api/monitoramento/sessao/:dispositivo', (req, res) => {
+    const dispositivo = req.params.dispositivo;
+
+    const sessaoId = sessoesEmMonitoramento.get(dispositivo) ?? null;
+
+    res.json({
+        dispositivo,
+        sessaoId,
+        ativo: sessaoId !== null
+    });
+});
 
 app.get('/api/pacientes', (req, res) => {
     db.all(`SELECT * FROM pacientes`, [], (err, rows) => {
@@ -209,8 +372,59 @@ app.get('/api/pacientes', (req, res) => {
     });
 });
 
+
+app.post('/api/pacientes', (req, res) => {
+    const { nome, idade, dispositivo } = req.body;
+
+    const nomeValido =
+        typeof nome === 'string' &&
+        nome.trim().length >= 2 &&
+        nome.trim().length <= 100;
+
+    const idadeNumero = Number(idade);
+    const idadeValida =
+        Number.isInteger(idadeNumero) &&
+        idadeNumero >= 0 &&
+        idadeNumero <= 120;
+
+    const dispositivoValido =
+        typeof dispositivo === 'string' &&
+        dispositivo.trim().length > 0 &&
+        dispositivo.trim().length <= 100;
+
+    if (!nomeValido || !idadeValida || !dispositivoValido) {
+        return res.status(400).json({
+            erro: 'Informe nome, idade e dispositivo válidos.'
+        });
+    }
+
+    const sql = `
+        INSERT INTO pacientes (nome, idade, dispositivo)
+        VALUES (?, ?, ?)
+    `;
+
+    db.run(
+        sql,
+        [nome.trim(), idadeNumero, dispositivo.trim()],
+        function (err) {
+            if (err) {
+                return res.status(500).json({
+                    erro: 'Não foi possível salvar o cadastro.'
+                });
+            }
+
+            res.status(201).json({
+                id: this.lastID,
+                nome: nome.trim(),
+                idade: idadeNumero,
+                dispositivo: dispositivo.trim()
+            });
+        }
+    );
+});
+
 app.post('/api/dados', (req, res) => {
-    const { dispositivo, bpm, spo2 } = req.body;
+    const { dispositivo, bpm, spo2, sessaoId } = req.body;
     estatisticasComunicacao.medicoesRecebidas++;
 
     const dispositivoValido =
@@ -237,7 +451,35 @@ app.post('/api/dados', (req, res) => {
         });
     }
 
+    const sessaoAtiva = sessoesEmMonitoramento.get(dispositivo) ?? null;
+
+    const sessaoInformada =
+        typeof sessaoId === 'string' ? sessaoId : '';
+
+    const sessaoInvalida = sessaoAtiva
+        ? sessaoInformada !== sessaoAtiva
+        : sessaoInformada !== '';
+
+    if (sessaoInvalida) {
+        estatisticasComunicacao.medicoesRejeitadas++;
+
+        console.warn(
+            `[SESSAO REJEITADA] Dispositivo: ${dispositivo}`
+        );
+
+        return res.status(409).json({
+            erro: 'Sessão de monitoramento inválida ou encerrada.'
+        });
+    }
+
     ultimaConexaoESP = Date.now();
+
+    if (bpm === 0 && spo2 === 0) {
+        sensoresComDedoRemovido.add(dispositivo);
+        ultimaConfirmacaoSemDedo.set(dispositivo, Date.now());
+    } else {
+        sensoresComDedoRemovido.delete(dispositivo);
+    }
 
     // Comando de interface
     if (bpm <= 0) {
@@ -249,14 +491,27 @@ app.post('/api/dados', (req, res) => {
         return res.status(201).json({ status: 'Estado da interface atualizado' });
     }
 
+    const pacienteId = pacientesEmMonitoramento.get(dispositivo) ?? null;
 
-    // Leitura real: grava no SQLite e atualiza o estado atual.
+    if (pacienteId === null || sessaoAtiva === null) {
+        estatisticasComunicacao.medicoesRejeitadas++;
+
+        console.warn(
+            `[MONITORAMENTO] Leitura descartada: nenhum paciente ativo para ${dispositivo}`
+        );
+
+        return res.status(409).json({
+            erro: 'Não existe monitoramento ativo para registrar esta medição.'
+        });
+    }
+
     const query = `
-        INSERT INTO leituras (dispositivo, bpm, spo2)
-        VALUES (?, ?, ?)
+        INSERT INTO leituras (dispositivo, bpm, spo2, paciente_id)
+        VALUES (?, ?, ?, ?)
     `;
 
-    db.run(query, [dispositivo, bpm, spo2], function (err) {
+    db.run(query, [dispositivo, bpm, spo2, pacienteId], function (err) {
+
         if (err) {
             estatisticasComunicacao.falhasBanco++;
 
@@ -268,10 +523,9 @@ app.post('/api/dados', (req, res) => {
         estatisticasComunicacao.medicoesAceitas++;
         estatisticasComunicacao.leiturasGravadas++;
 
-        // Mantém em memória a última leitura válida recebida.
-        // O horário vem do servidor, não do relógio do navegador.
         estadosUI[dispositivo] = {
             id: this.lastID,
+            paciente_id: pacienteId,
             bpm,
             spo2,
             recebidaEm: Date.now()
@@ -289,21 +543,108 @@ app.post('/api/dados', (req, res) => {
 });
 
 app.delete('/api/pacientes/:id', (req, res) => {
-    const { id } = req.params;
-    db.run(`DELETE FROM pacientes WHERE id = ?`, id, function (err) {
-        if (err) return res.status(500).json({ erro: err.message });
-        res.json({ mensagem: 'Paciente removido com sucesso', linhasAfetadas: this.changes });
-    });
+    const pacienteId = Number(req.params.id);
+
+    if (!Number.isSafeInteger(pacienteId) || pacienteId <= 0) {
+        return res.status(400).json({
+            erro: 'ID do paciente inválido.'
+        });
+    }
+
+    db.get(
+        'SELECT id FROM pacientes WHERE id = ?',
+        [pacienteId],
+        (erro, paciente) => {
+            if (erro) {
+                return res.status(500).json({
+                    erro: 'Erro ao consultar paciente.'
+                });
+            }
+
+            if (!paciente) {
+                return res.status(404).json({
+                    erro: 'Paciente não encontrado.'
+                });
+            }
+
+            // Impede excluir quem está sendo monitorado.
+            const monitoramentoAtivo = [
+                ...pacientesEmMonitoramento.values()
+            ].some(id => id === pacienteId);
+
+            if (monitoramentoAtivo) {
+                return res.status(409).json({
+                    erro: 'Encerre o monitoramento antes de excluir este paciente.'
+                });
+            }
+
+            db.get(
+                'SELECT COUNT(*) AS total FROM leituras WHERE paciente_id = ?',
+                [pacienteId],
+                (erroHistorico, resultado) => {
+                    if (erroHistorico) {
+                        return res.status(500).json({
+                            erro: 'Erro ao consultar histórico.'
+                        });
+                    }
+
+                    if (resultado.total > 0) {
+                        return res.status(409).json({
+                            erro: `Este paciente possui ${resultado.total} medições. A exclusão foi bloqueada para preservar o histórico.`
+                        });
+                    }
+
+                    db.run(
+                        'DELETE FROM pacientes WHERE id = ?',
+                        [pacienteId],
+                        function (erroExclusao) {
+                            if (erroExclusao) {
+                                return res.status(500).json({
+                                    erro: 'Erro ao excluir paciente.'
+                                });
+                            }
+
+                            res.json({
+                                mensagem: 'Paciente removido com sucesso.',
+                                linhasAfetadas: this.changes
+                            });
+                        }
+                    );
+                }
+            );
+        }
+    );
 });
 
-
-// Tempo máximo para considerar uma medição como atual.
 const TEMPO_MAXIMO_LEITURA_MS = 10000;
 
 app.get('/api/dados/ultimo/:dispositivo', (req, res) => {
     const { dispositivo } = req.params;
+    const pacienteIdAtivo = pacientesEmMonitoramento.get(dispositivo);
+
+    if (pacienteIdAtivo === undefined) {
+        return res.json({
+            bpm: 0,
+            spo2: 0,
+            paciente_id: null,
+            monitoramentoAtivo: false
+        });
+    }
 
     const estado = estadosUI[dispositivo];
+
+    if (
+        estado &&
+        estado.bpm > 0 &&
+        estado.paciente_id !== pacienteIdAtivo
+    ) {
+        return res.json({
+            bpm: 0,
+            spo2: 0,
+            paciente_id: pacienteIdAtivo,
+            monitoramentoAtivo: true
+        });
+    }
 
     // Nenhum estado atual recebido desde a inicialização.
     // Não reutiliza uma leitura antiga do banco SQLite.
@@ -337,11 +678,70 @@ app.get('/api/dados/ultimo/:dispositivo', (req, res) => {
     res.json(estado);
 });
 
+
 app.get('/api/relatorios/geral', (req, res) => {
-    const query = `SELECT * FROM leituras ORDER BY id DESC LIMIT 100`;
-    db.all(query, [], (err, rows) => {
-        if (err) return res.status(500).json({ erro: err.message });
-        res.json(rows);
+    const { inicio, fim } = req.query;
+
+    const dataValida = valor => {
+        if (typeof valor !== 'string' ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            return false;
+        }
+
+        const data = new Date(`${valor}T00:00:00Z`);
+
+        return !Number.isNaN(data.getTime()) &&
+            data.toISOString().slice(0, 10) === valor;
+    };
+
+    if (
+        (inicio !== undefined && !dataValida(inicio)) ||
+        (fim !== undefined && !dataValida(fim))
+    ) {
+        return res.status(400).json({
+            erro: 'Informe datas válidas no formato AAAA-MM-DD.'
+        });
+    }
+
+    if (inicio && fim && inicio > fim) {
+        return res.status(400).json({
+            erro: 'A data inicial não pode ser posterior à final.'
+        });
+    }
+
+    const condicoes = [];
+    const parametros = [];
+
+    if (inicio) {
+        condicoes.push("date(timestamp, '-3 hours') >= ?");
+        parametros.push(inicio);
+    }
+
+    if (fim) {
+        condicoes.push("date(timestamp, '-3 hours') <= ?");
+        parametros.push(fim);
+    }
+
+    const whereSQL = condicoes.length
+        ? `WHERE ${condicoes.join(' AND ')}`
+        : '';
+
+    const query = `
+        SELECT *
+        FROM leituras
+        ${whereSQL}
+        ORDER BY id DESC
+        LIMIT 100
+    `;
+
+    db.all(query, parametros, (erro, leituras) => {
+        if (erro) {
+            return res.status(500).json({
+                erro: 'Erro ao consultar relatório geral.'
+            });
+        }
+
+        res.json(leituras);
     });
 });
 
@@ -354,13 +754,125 @@ app.get('/api/relatorios/individual/:dispositivo', (req, res) => {
     });
 });
 
+app.get('/api/pacientes/:id/historico', (req, res) => {
+    const pacienteId = Number(req.params.id);
 
-/*
- * BIOIOT - ANÁLISE DE ALGORITMOS COM DADOS REAIS
- *
- * Retorna as últimas medições registradas no SQLite.
- * Não altera nem remove informações do banco.
- */
+    const inicio = req.query.inicio;
+    const fim = req.query.fim;
+
+    function dataValida(valor) {
+        if (typeof valor !== 'string' ||
+            !/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            return false;
+        }
+
+        const data = new Date(valor + 'T00:00:00Z');
+
+        return !Number.isNaN(data.getTime()) &&
+            data.toISOString().slice(0, 10) === valor;
+    }
+
+    if (
+        (inicio !== undefined && !dataValida(inicio)) ||
+        (fim !== undefined && !dataValida(fim))
+    ) {
+        return res.status(400).json({
+            erro: 'Informe datas válidas no formato AAAA-MM-DD.'
+        });
+    }
+
+    if (inicio && fim && inicio > fim) {
+        return res.status(400).json({
+            erro: 'A data inicial não pode ser posterior à final.'
+        });
+    }
+
+    const condicoes = ['paciente_id = ?'];
+    const parametros = [pacienteId];
+
+    if (inicio) {
+        condicoes.push("date(timestamp, '-3 hours') >= ?");
+        parametros.push(inicio);
+    }
+
+    if (fim) {
+        condicoes.push("date(timestamp, '-3 hours') <= ?");
+        parametros.push(fim);
+    }
+
+    const filtroSQL = condicoes.join(' AND ');
+
+    if (!Number.isSafeInteger(pacienteId) || pacienteId <= 0) {
+        return res.status(400).json({
+            erro: 'ID do paciente inválido.'
+        });
+    }
+
+    db.get(
+        'SELECT id, nome, idade, dispositivo FROM pacientes WHERE id = ?',
+        [pacienteId],
+        (erroPaciente, paciente) => {
+            if (erroPaciente) {
+                return res.status(500).json({
+                    erro: 'Erro ao consultar paciente.'
+                });
+            }
+
+            if (!paciente) {
+                return res.status(404).json({
+                    erro: 'Paciente não encontrado.'
+                });
+            }
+
+            const query = `
+                SELECT
+                    COUNT(*) AS total,
+                    ROUND(AVG(bpm), 2) AS mediaBpm,
+                    ROUND(AVG(spo2), 2) AS mediaSpo2,
+                    MIN(timestamp) AS primeiraMedicao,
+                    MAX(timestamp) AS ultimaMedicao
+                FROM leituras
+                WHERE ${filtroSQL}
+            `;
+
+            db.get(query, parametros, (erroResumo, resumo) => {
+                if (erroResumo) {
+                    return res.status(500).json({
+                        erro: 'Erro ao calcular estatísticas.'
+                    });
+                }
+
+
+                const queryHistorico = `
+    SELECT id, dispositivo, bpm, spo2, timestamp
+    FROM leituras
+    WHERE ${filtroSQL}
+    ORDER BY id DESC
+    LIMIT 100
+`;
+
+                db.all(
+                    queryHistorico,
+                    parametros,
+                    (erroLeituras, leituras) => {
+                        if (erroLeituras) {
+                            return res.status(500).json({
+                                erro: 'Erro ao consultar histórico.'
+                            });
+                        }
+
+                        res.json({
+                            paciente,
+                            resumo,
+                            leituras
+                        });
+                    }
+                );
+            });
+        }
+    );
+});
+
 app.get('/api/algoritmos/medicoes', (req, res) => {
     const dispositivo = String(req.query.dispositivo || 'ESP32-BANCADA-01');
     const quantidade = Number(req.query.quantidade || 100);

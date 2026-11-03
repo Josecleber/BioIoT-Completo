@@ -148,6 +148,15 @@
 
                 <div class="card" style="margin-top: 2rem;">
                     <h3 style="margin-bottom: 1rem;">Lista de Pessoas Cadastradas</h3>
+                    <button type="button" onclick="encerrarMonitoramento()" style="background: var(--accent-red);
+               color: white;
+               border: none;
+               padding: 0.7rem 1rem;
+               border-radius: 6px;
+               cursor: pointer;
+               margin-bottom: 1rem;">
+                        Encerrar monitoramento
+                    </button>
                     <div style="overflow-x: auto;">
                         <table
                             style="width: 100%; border-collapse: collapse; text-align: left; color: var(--text-main);">
@@ -162,6 +171,87 @@
                             </thead>
                             <tbody id="patientsTableBody">
                             </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" id="historicoPacienteCard" style="margin-top: 2rem; display: none;">
+
+                    <h3 style="margin-bottom: 0.5rem; color: var(--accent-blue);">
+                        Histórico Individual
+                    </h3>
+
+                    <p id="historicoPacienteNome" style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                    </p>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem;
+            align-items: end; margin-bottom: 1.5rem;">
+
+                        <div>
+                            <label for="historicoDataInicio" style="display: block; color: var(--text-muted);
+                      margin-bottom: 0.4rem;">
+                                Data inicial
+                            </label>
+                            <input type="date" id="historicoDataInicio" style="padding: 0.7rem; background: #0f172a;
+                      color: white; border: 1px solid var(--card-border);
+                      border-radius: 6px;">
+                        </div>
+
+                        <div>
+                            <label for="historicoDataFim" style="display: block; color: var(--text-muted);
+                      margin-bottom: 0.4rem;">
+                                Data final
+                            </label>
+                            <input type="date" id="historicoDataFim" style="padding: 0.7rem; background: #0f172a;
+                      color: white; border: 1px solid var(--card-border);
+                      border-radius: 6px;">
+                        </div>
+
+                        <button type="button" onclick="filtrarHistoricoPaciente()" style="background: var(--accent-blue); color: #00111f;
+                   border: none; padding: 0.75rem 1rem;
+                   border-radius: 6px; font-weight: bold; cursor: pointer;">
+                            Filtrar histórico
+                        </button>
+
+                        <button type="button" onclick="limparFiltroHistorico()" style="background: #334155; color: white;
+                   border: none; padding: 0.75rem 1rem;
+                   border-radius: 6px; cursor: pointer;">
+                            Limpar filtro
+                        </button>
+                    </div>
+
+                    <div style="display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 1rem; margin-bottom: 1.5rem;">
+
+                        <div>
+                            <p style="color: var(--text-muted);">Total de medições</p>
+                            <h2 id="historicoTotal">--</h2>
+                        </div>
+
+                        <div>
+                            <p style="color: var(--text-muted);">BPM médio</p>
+                            <h2 id="historicoMediaBpm">--</h2>
+                        </div>
+
+                        <div>
+                            <p style="color: var(--text-muted);">SpO₂ média</p>
+                            <h2 id="historicoMediaSpo2">--</h2>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--card-border);
+                           color: var(--text-muted);">
+                                    <th style="padding: 10px;">Data e horário</th>
+                                    <th style="padding: 10px;">BPM</th>
+                                    <th style="padding: 10px;">SpO₂</th>
+                                    <th style="padding: 10px;">Dispositivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoPacienteTabela"></tbody>
                         </table>
                     </div>
                 </div>
@@ -443,6 +533,42 @@
                                 <option value="individual">Relatório Individual (Paciente Ativo)</option>
                                 <option value="geral">Relatório Geral (Painel da Staff)</option>
                             </select>
+
+                            <div id="campoPacienteRelatorio" style="margin-top: 1rem;">
+                                <label for="pacienteRelatorio" style="display: block; font-size: 0.8rem;
+                  color: var(--text-muted); margin-bottom: 0.3rem;">
+                                    Paciente
+                                </label>
+
+                                <select id="pacienteRelatorio" onchange="carregarTabelaRelatorios()" style="padding: 0.6rem;
+                   background: #0f172a;
+                   border: 1px solid var(--card-border);
+                   color: #fff;
+                   border-radius: 6px;">
+                                    <option value="">Selecione um paciente</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                                <div>
+                                    <label for="relatorioDataInicio">Data inicial</label>
+                                    <input type="date" id="relatorioDataInicio" style="display:block; padding:0.6rem; background:#0f172a;
+                      color:white; border:1px solid var(--card-border);
+                      border-radius:6px;">
+                                </div>
+
+                                <div>
+                                    <label for="relatorioDataFim">Data final</label>
+                                    <input type="date" id="relatorioDataFim" style="display:block; padding:0.6rem; background:#0f172a;
+                      color:white; border:1px solid var(--card-border);
+                      border-radius:6px;">
+                                </div>
+
+                                <button type="button" onclick="carregarTabelaRelatorios()" style="align-self:end; padding:0.7rem 1rem;
+                   background:var(--accent-blue); color:#00111f;
+                   border:0; border-radius:6px; cursor:pointer;">
+                                    Filtrar relatório
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div>
