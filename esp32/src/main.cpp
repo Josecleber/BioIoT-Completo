@@ -111,7 +111,7 @@ namespace
 
           if (status == 200)
           {
-            Serial.println("[HEARTBEAT OK] ESP32 conectado ao servidor");
+            //Serial.println("[HEARTBEAT OK] ESP32 conectado ao servidor");
           }
           else
           {
@@ -128,12 +128,8 @@ namespace
         ultimoHeartbeat = millis();
       }
 
-      const bool sensorLivre =
-          leituraEstadoSensor.state == ppg::SignalState::NoFinger;
-
-      if (sensorLivre &&
-          static_cast<uint32_t>(now - ultimaConsultaSessao) >=
-              INTERVALO_CONSULTA_SESSAO_MS)
+      // A ESP32 verifica a sessão a cada 3 segundos, COM ou SEM o dedo no sensor
+      if (static_cast<uint32_t>(now - ultimaConsultaSessao) >= INTERVALO_CONSULTA_SESSAO_MS)
       {
         WiFiClient clienteSessao;
         HTTPClient consultaSessao;
@@ -265,7 +261,7 @@ namespace
           {
             if (isZeroPayload)
             {
-              Serial.println("[ENVIO OK] Dedo removido | Painel zerado | HTTP 201");
+              // Serial.println("[ENVIO OK] Dedo removido | Painel zerado | HTTP 201");
               jaEnviouZeros = true;
               ultimoEnvioSemDedo = millis();
             }
