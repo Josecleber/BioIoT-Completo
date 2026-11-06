@@ -44,13 +44,22 @@
         </aside>
 
         <main class="main-content">
-            <div class="top-bar" style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
-                <div class="patient-badge"
-                    style="background: var(--card-bg); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; align-items: center; gap: 0.5rem;">
-                    <i data-lucide="user" style="width: 16px; color: var(--accent-blue);"></i>
-                    <span>Pessoa Monitorada: <strong id="activePatientName">Nenhum</strong> <span id="activePatientInfo"
-                            style="color: var(--text-muted);">( - )</span></span>
+            <div class="top-bar" style="display: flex; justify-content: flex-end; margin-bottom: 2rem; align-items: center; gap: 1rem;">
+                
+                <!-- Botão de Cadastro Rápido -->
+                <button type="button" onclick="abrirCadastroRapido()" style="background: var(--accent-blue); color: #00111f; border: none; padding: 0.6rem 1rem; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s;">
+                    <i data-lucide="user-plus" style="width: 18px;"></i> Novo Paciente
+                </button>
+
+                <!-- Menu Dropdown do Paciente Ativo -->
+                <div class="patient-badge" style="background: var(--card-bg); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="user" style="width: 18px; color: var(--accent-blue);"></i>
+                    <span>Monitorando:</span>
+                    <select id="seletorPacienteTopo" onchange="trocarPacienteTopo(this.value)" style="background: #0f172a; color: white; border: 1px solid var(--card-border); padding: 0.4rem; border-radius: 4px; outline: none; cursor: pointer; font-weight: bold;">
+                        <option value="">Nenhum (Livre)</option>
+                    </select>
                 </div>
+
             </div>
 
             <div id="dashboard" class="tab-content active">

@@ -728,6 +728,21 @@ async function carregarPacientes() {
             return;
         }
 
+        const seletorTopo = document.getElementById('seletorPacienteTopo');
+        if (seletorTopo) {
+            seletorTopo.innerHTML = '<option value="">Nenhum (Livre)</option>';
+            pacientes.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.nome} (${p.idade} anos)`;
+                opt.dataset.nome = p.nome;
+                opt.dataset.idade = p.idade;
+                opt.dataset.dispositivo = p.dispositivo;
+                seletorTopo.appendChild(opt);
+            });
+            // Mantém selecionado quem já estava ativo
+            if (pacienteAtivo.id) seletorTopo.value = pacienteAtivo.id;
+        }
 
         pacientes.forEach(p => {
             const tr = document.createElement('tr');
@@ -1020,6 +1035,8 @@ async function selecionarPacienteParaMonitorar(id, nome, idade, dispositivo) {
         if (infoElemento) infoElemento.textContent = `(${paciente.idade} anos)`;
         if (dispositivoElemento) dispositivoElemento.textContent = paciente.dispositivo;
 
+        document.getElementById('seletorPacienteTopo').value = pacienteAtivo.id;
+
         atualizarDadosDashboard();
 
         console.log('Monitoramento iniciado:', paciente);
@@ -1033,6 +1050,7 @@ async function selecionarPacienteParaMonitorar(id, nome, idade, dispositivo) {
 
 async function encerrarMonitoramento() {
     if (!pacienteAtivo.id) {
+        document.getElementById('seletorPacienteTopo').value = "";
         alert('Nenhum paciente está selecionado nesta página.');
         return;
     }
@@ -2069,4 +2087,69 @@ function testarSomAlarmeSimulado() {
             'Teste sonoro executado. Verifique se ouviu o aviso.';
         resultado.style.color = 'var(--accent-blue)';
     }
+}
+
+// --- NOVAS FUNÇÕES PARA A BARRA DO TOPO ---
+
+async function abrirCadastroRapido() {
+    const nome = prompt("Digite o NOME do novo paciente:");
+    if (!nome) return; // Cancela se deixar em branco
+
+    const idade = prompt(`Qual a IDADE de ${nome}?`);
+    if (!idade) return;
+
+    // Assumimos o ESP32 padrão da bancada para agilizar
+    const dispositivo = "ESP32-BANCADA-01"; 
+
+    try {
+        const res = await fetch('/api/pacientes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, idade, dispositivo })
+        });
+
+        if (res.ok) {
+            const novoPaciente = await res.json();
+            await carregarPacientes(); // Atualiza as listas e o dropdown
+
+            // Se confirmarem, já inicia o monitoramento deste paciente logo após o cadastro
+            if (confirm(`Paciente ${nome} cadastrado com sucesso! Deseja iniciar o monitoramento agora?`)) {
+                trocarPacienteTopo(novoPaciente.id);
+            }
+        } else {
+            const erro = await res.json();
+            alert("Erro ao cadastrar: " + (erro.erro || "Verifique os dados."));
+        }
+    } catch (err) {
+        console.error("Erro no cadastro rápido:", err);
+    }
+}
+
+async function trocarPacienteTopo(id) {
+    if (!id) {
+        await encerrarMonitoramento();
+        return;
+    }
+
+    const seletor = document.getElementById('seletorPacienteTopo');
+    const opcao = seletor.options[seletor.selectedIndex];
+
+    // Se já havia um paciente ativo, o backend exige que seja encerrado primeiro
+    if (pacienteAtivo.id) {
+        try {
+            await fetch('/api/monitoramento/encerrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dispositivo: pacienteAtivo.dispositivo })
+            });
+        } catch(e) { console.error("Falha ao encerrar o monitoramento anterior", e); }
+    }
+
+    // Inicia o novo (A função original já lida com os alertas de tirar o dedo do sensor!)
+    await selecionarPacienteParaMonitorar(
+        Number(id),
+        opcao.dataset.nome,
+        opcao.dataset.idade,
+        opcao.dataset.dispositivo
+    );
 }

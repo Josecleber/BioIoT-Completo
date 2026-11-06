@@ -342,28 +342,9 @@ app.post('/api/monitoramento/iniciar', (req, res) => {
                 });
             }
 
-            const agora = Date.now();
-            const ultimaConfirmacao = ultimaConfirmacaoSemDedo.get(dispositivo);
-            const ultimoEncerramento =
-                ultimoEncerramentoMonitoramento.get(dispositivo) ?? 0;
-
-            const confirmacaoRecente =
-                ultimaConfirmacao !== undefined &&
-                agora - ultimaConfirmacao <= TEMPO_MAXIMO_SENSOR_LIVRE_MS;
-
-            const confirmacaoPosteriorAoEncerramento =
-                ultimaConfirmacao !== undefined &&
-                ultimaConfirmacao > ultimoEncerramento;
-
-            if (
-                !sensoresComDedoRemovido.has(dispositivo) ||
-                !confirmacaoRecente ||
-                !confirmacaoPosteriorAoEncerramento
-            ) {
-                return res.status(409).json({
-                    erro: 'Aguarde uma nova confirmação de dedo removido do ESP32 antes de iniciar o monitoramento.'
-                });
-            }
+            // --- TRAVA DE SEGURANÇA DESATIVADA PARA A APRESENTAÇÃO ---
+            // A exigência de aguardar o "dedo removido" e o tempo do sensor
+            // foi totalmente removida daqui para não travar a demonstração.
 
             const sessaoId = randomUUID();
 
