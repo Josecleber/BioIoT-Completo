@@ -288,8 +288,7 @@ namespace
               ultimaConsultaSessao =
                   millis() - INTERVALO_CONSULTA_SESSAO_MS;
 
-              Serial.println(
-                  "[SESSAO] Identificador rejeitado. Aguardando sensor livre.");
+              Serial.println("[SESSAO] Monitoramento em Modo Livre...");
             }
             if (isZeroPayload)
             {

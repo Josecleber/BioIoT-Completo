@@ -1046,14 +1046,20 @@ app.post('/api/dados', (req, res) => {
     const pacienteId = pacientesEmMonitoramento.get(dispositivo) ?? null;
 
     if (pacienteId === null || sessaoAtiva === null) {
-        estatisticasComunicacao.medicoesRejeitadas++;
+        // MODO LIVRE: Aceita os dados para o gráfico, mas NÃO salva no SQLite
+        estatisticasComunicacao.medicoesAceitas++;
+        
+        estadosUI[dispositivo] = {
+            id: Date.now(),
+            paciente_id: null,
+            bpm,
+            spo2,
+            recebidaEm: Date.now()
+        };
 
-        console.warn(
-            `[MONITORAMENTO] Leitura descartada: nenhum paciente ativo para ${dispositivo}`
-        );
-
-        return res.status(409).json({
-            erro: 'Não existe monitoramento ativo para registrar esta medição.'
+        return res.status(201).json({ 
+            status: 'Modo Livre (Não Salvo no Histórico)', 
+            leituraId: null 
         });
     }
 
@@ -1231,8 +1237,20 @@ const TEMPO_MAXIMO_LEITURA_MS = 10000;
 app.get('/api/dados/ultimo/:dispositivo', (req, res) => {
     const { dispositivo } = req.params;
     const pacienteIdAtivo = pacientesEmMonitoramento.get(dispositivo);
+    const estado = estadosUI[dispositivo];
 
+    // MODO LIVRE: Se não há paciente ativo, mas há leitura na memória, entrega ao gráfico
     if (pacienteIdAtivo === undefined) {
+        if (estado) {
+            if (estado.bpm <= 0 || (Date.now() - estado.recebidaEm <= TEMPO_MAXIMO_LEITURA_MS)) {
+                return res.json({
+                    ...estado,
+                    paciente_id: null,
+                    monitoramentoAtivo: false
+                });
+            }
+        }
+
         return res.json({
             bpm: 0,
             spo2: 0,
@@ -1240,8 +1258,6 @@ app.get('/api/dados/ultimo/:dispositivo', (req, res) => {
             monitoramentoAtivo: false
         });
     }
-
-    const estado = estadosUI[dispositivo];
 
     if (
         estado &&

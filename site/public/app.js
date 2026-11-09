@@ -224,28 +224,29 @@ function emitirBipAlarme() {
     }
 
     const contexto = audioContextAlarme;
-
     if (contexto.state !== 'running') return;
 
-    const oscilador = contexto.createOscillator();
-    const volume = contexto.createGain();
+    const inicio = contexto.currentTime;
 
-    oscilador.type = 'sine';
-    oscilador.frequency.value = 850;
+    for (let i = 0; i < 3; i++) {
+        const oscilador = contexto.createOscillator();
+        const volume = contexto.createGain();
 
-    volume.gain.setValueAtTime(0.0001, contexto.currentTime);
-    volume.gain.exponentialRampToValueAtTime(
-        0.12, contexto.currentTime + 0.02
-    );
-    volume.gain.exponentialRampToValueAtTime(
-        0.0001, contexto.currentTime + 0.30
-    );
+        oscilador.type = 'square'
+        oscilador.frequency.value = 1000;
 
-    oscilador.connect(volume);
-    volume.connect(contexto.destination);
+        const tempoInicioBipe = inicio + (i * 0.5);
 
-    oscilador.start();
-    oscilador.stop(contexto.currentTime + 0.31);
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe); 
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe + 0.15); 
+        volume.gain.linearRampToValueAtTime(0.0001, tempoInicioBipe + 0.16);
+
+        oscilador.connect(volume);
+        volume.connect(contexto.destination);
+
+        oscilador.start(tempoInicioBipe);
+        oscilador.stop(tempoInicioBipe + 0.16);
+    }
 }
 
 function pararSomAlarme() {
@@ -1093,8 +1094,6 @@ async function encerrarMonitoramento() {
             realtimeChart.update();
         }
 
-        document.getElementById('activePatientName').textContent = 'Nenhum';
-        document.getElementById('activePatientInfo').textContent = '( - )';
         document.getElementById('bpmValue').textContent = '--';
         document.getElementById('spo2Value').textContent = '--';
 
@@ -1109,7 +1108,6 @@ async function encerrarMonitoramento() {
         document.getElementById('alarmeBpm').textContent = '--';
         document.getElementById('alarmeSpo2').textContent = '--';
 
-        alert('Monitoramento encerrado com sucesso.');
 
     } catch (erro) {
         console.error('Erro ao encerrar monitoramento:', erro);
@@ -2046,8 +2044,6 @@ function encerrarSimulacaoAlarme() {
 
 
 function testarSomAlarmeSimulado() {
-    // Teste isolado: não modifica alarmes reais
-    // nem envia medições ao servidor.
     if (!somAlarmeAtivado || somAlarmeSilenciado ||
         !audioContextAlarme ||
         audioContextAlarme.state !== 'running') {
@@ -2056,36 +2052,32 @@ function testarSomAlarmeSimulado() {
     }
 
     const contexto = audioContextAlarme;
-    const oscilador = contexto.createOscillator();
-    const volume = contexto.createGain();
-
-    oscilador.type = 'sine';
-    oscilador.frequency.value = 850;
-
     const inicio = contexto.currentTime;
 
-    volume.gain.setValueAtTime(0.0001, inicio);
-    volume.gain.exponentialRampToValueAtTime(
-        0.12, inicio + 0.02
-    );
-    volume.gain.exponentialRampToValueAtTime(
-        0.0001, inicio + 0.30
-    );
+    // A mesma lógica de 3 bipes para o botão de teste
+    for (let i = 0; i < 3; i++) {
+        const oscilador = contexto.createOscillator();
+        const volume = contexto.createGain();
 
-    oscilador.connect(volume);
-    volume.connect(contexto.destination);
+        oscilador.type = 'square';
+        oscilador.frequency.value = 1000;
 
-    oscilador.start(inicio);
-    oscilador.stop(inicio + 0.31);
+        const tempoInicioBipe = inicio + (i * 0.5);
 
-    const resultado = document.getElementById(
-        'resultadoSimulacaoAlarme'
-    );
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe); 
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe + 0.15); 
+        volume.gain.linearRampToValueAtTime(0.0001, tempoInicioBipe + 0.16);
 
+        oscilador.connect(volume);
+        volume.connect(contexto.destination);
+
+        oscilador.start(tempoInicioBipe);
+        oscilador.stop(tempoInicioBipe + 0.16);
+    }
+
+    const resultado = document.getElementById('resultadoSimulacaoAlarme');
     if (resultado) {
-        resultado.textContent =
-            'Teste sonoro executado. Verifique se ouviu o aviso.';
-        resultado.style.color = 'var(--accent-blue)';
+        resultado.textContent = 'Alarme sonoro executado.';
     }
 }
 
