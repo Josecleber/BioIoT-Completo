@@ -11,9 +11,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 const dbPath = path.resolve(__dirname, 'banco.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
-        console.error('Erro ao abrir o banco de dados SQLite:', err.message);
+        console.error('Erro ao conectar ao banco SQLite:', err.message);
     } else {
-        console.log('Conectado ao banco de dados SQLite com sucesso.');
+        console.log('Conectado ao banco SQLite com sucesso.');
+        db.run('PRAGMA journal_mode = WAL;');
     }
 });
 

@@ -1592,13 +1592,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sincronizarPacienteAtivo();
 
-    setInterval(verificarStatusConexaoESP, 3000);
-    setInterval(atualizarDadosDashboard, 2000);
-    setInterval(() => {
-        const abaAlarmes = document.getElementById('alarmes');
+    setInterval(async () => {
+        if (!pacienteAtivo.dispositivo) return;
 
+        await atualizarDadosDashboard(); 
+
+        const abaAlarmes = document.getElementById('alarmes');
         if (abaAlarmes && abaAlarmes.classList.contains('active')) {
-            atualizarMedicoesAlarmes();
+            atualizarMedicoesAlarmes(); 
         }
     }, 2000);
 
