@@ -537,11 +537,11 @@ async function atualizarMedicoesAlarmes() {
         atualizarAlertaSonoro(false);
     };
 
-    if (!pacienteAtivo.id) {
-        limparMedicoes();
-        atualizarPacienteAlarmes();
-        return;
-    }
+    // if (!pacienteAtivo.id) {
+    //     limparMedicoes();
+    //     atualizarPacienteAlarmes();
+    //     return;
+    // }
 
     const versaoAtual = ++versaoConsultaAlarmes;
     const pacienteIdConsultado = pacienteAtivo.id;
@@ -652,9 +652,8 @@ function atualizarPacienteAlarmes() {
     if (!nome || !titulo || !descricao) return;
 
     if (!pacienteAtivo.id) {
-        nome.textContent = 'Nenhum';
-        titulo.textContent = 'Aguardando monitoramento';
-        descricao.textContent = 'Nenhum paciente em monitoramento.';
+        nome.textContent = 'Nenhum (Modo Livre)';
+        descricao.textContent = `Dispositivo: ${pacienteAtivo.dispositivo} | Alarmes ativos sem gravação`;
         return;
     }
 
