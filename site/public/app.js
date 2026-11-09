@@ -16,22 +16,23 @@ const historicoDesempenho = [];
 
 function marcarInterrupcaoGrafico() {
     if (!realtimeChart || graficoEmPausa) return;
+    
+    const qtdPontos = realtimeChart.data.datasets[0].data.length;
+    if (qtdPontos === 0) return; // Não faz nada se já estiver limpo na esquerda
 
-    if (realtimeChart.data.labels.length === 0) return;
+    const agora = new Date().toLocaleTimeString('pt-BR');
 
-    realtimeChart.data.labels.push(
-        new Date().toLocaleTimeString('pt-BR')
-    );
-
-    realtimeChart.data.datasets.forEach(dataset => {
-        dataset.data.push(null);
-    });
-
-    while (realtimeChart.data.labels.length > 10) {
+    if (qtdPontos < 10) {
+        realtimeChart.data.labels[qtdPontos] = agora;
+        realtimeChart.data.datasets[0].data.push(null);
+        realtimeChart.data.datasets[1].data.push(null);
+    } else {
         realtimeChart.data.labels.shift();
-        realtimeChart.data.datasets.forEach(dataset => {
-            dataset.data.shift();
-        });
+        realtimeChart.data.labels.push(agora);
+        realtimeChart.data.datasets[0].data.shift();
+        realtimeChart.data.datasets[0].data.push(null);
+        realtimeChart.data.datasets[1].data.shift();
+        realtimeChart.data.datasets[1].data.push(null);
     }
 
     graficoEmPausa = true;
@@ -1016,12 +1017,10 @@ async function selecionarPacienteParaMonitorar(id, nome, idade, dispositivo) {
         graficoEmPausa = false;
 
         if (realtimeChart) {
-            realtimeChart.data.labels = [];
-
+            realtimeChart.data.labels = Array(10).fill('');
             realtimeChart.data.datasets.forEach(dataset => {
                 dataset.data = [];
             });
-
             realtimeChart.update();
         }
 
@@ -1086,8 +1085,8 @@ async function encerrarMonitoramento() {
         ultimoIdPlotado = null;
         graficoEmPausa = false;
 
-        if (realtimeChart) {
-            realtimeChart.data.labels = [];
+       if (realtimeChart) {
+            realtimeChart.data.labels = Array(10).fill('');
             realtimeChart.data.datasets.forEach(dataset => {
                 dataset.data = [];
             });
@@ -1221,15 +1220,21 @@ async function atualizarDadosDashboard() {
         const agora = new Date().toLocaleTimeString('pt-BR');
 
         if (realtimeChart) {
-            if (realtimeChart.data.labels.length >= 10) {
-                realtimeChart.data.labels.shift();
-                realtimeChart.data.datasets[0].data.shift();
-                realtimeChart.data.datasets[1].data.shift();
-            }
+            const qtdPontos = realtimeChart.data.datasets[0].data.length;
 
-            realtimeChart.data.labels.push(agora);
-            realtimeChart.data.datasets[0].data.push(bpm);
-            realtimeChart.data.datasets[1].data.push(spo2);
+            if (qtdPontos < 10) {
+                realtimeChart.data.labels[qtdPontos] = agora;
+                realtimeChart.data.datasets[0].data.push(bpm);
+                realtimeChart.data.datasets[1].data.push(spo2);
+            } else {
+                realtimeChart.data.labels.shift();
+                realtimeChart.data.labels.push(agora);
+                realtimeChart.data.datasets[0].data.shift();
+                realtimeChart.data.datasets[0].data.push(bpm);
+                realtimeChart.data.datasets[1].data.shift();
+                realtimeChart.data.datasets[1].data.push(spo2);
+            }
+            
             realtimeChart.update();
         }
 
@@ -1242,16 +1247,19 @@ function inicializarGraficoSaude() {
     const ctx = document.getElementById('realtimeChart');
     if (!ctx) return;
 
+    const labelsIniciais = Array(10).fill('');
+    const dadosIniciais = Array(10).fill(null);
+
     realtimeChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [],
+            labels: [...labelsIniciais],
             datasets: [
                 {
                     label: 'BPM (Batimentos)',
                     borderColor: '#ef4444',
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    data: [],
+                    data: [...dadosIniciais],
                     tension: 0.3,
                     spanGaps: false,
                     fill: false
@@ -1260,7 +1268,7 @@ function inicializarGraficoSaude() {
                     label: 'SpO₂ (%)',
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    data: [],
+                    data: [...dadosIniciais],
                     tension: 0.3,
                     spanGaps: false,
                     fill: false
@@ -1272,8 +1280,14 @@ function inicializarGraficoSaude() {
             maintainAspectRatio: false,
             animation: false,
             scales: {
-                y: { beginAtZero: true, grid: { color: '#334155' } },
-                x: { grid: { color: '#334155' } }
+                y: { 
+                    beginAtZero: true, 
+                    grid: { color: '#334155' } 
+                },
+                x: { 
+                    grid: { color: '#334155' },
+                    ticks: { display: false }
+                }
             }
         }
     });
@@ -1544,7 +1558,7 @@ async function sincronizarPacienteAtivo() {
         graficoEmPausa = false;
 
         if (realtimeChart) {
-            realtimeChart.data.labels = [];
+            realtimeChart.data.labels = Array(10).fill('');
             realtimeChart.data.datasets.forEach(dataset => {
                 dataset.data = [];
             });
