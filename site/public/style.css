@@ -646,3 +646,184 @@ select:focus {
         grid-column: auto;
     }
 }
+
+/* ===== GÊMEO DIGITAL — CORAÇÃO ANATÔMICO ===== */
+
+.gemeo-heart-card {
+    min-height: 320px;
+}
+
+.gemeo-heart-stage {
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    gap: 10px;
+}
+
+.anatomical-heart-shell {
+    position: relative;
+    width: 230px;
+    height: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.anatomical-heart-svg {
+    width: 210px;
+    height: 210px;
+    overflow: visible;
+    filter: drop-shadow(0 0 18px rgba(239, 68, 68, 0.18));
+}
+
+.heart-shadow {
+    fill: rgba(0, 0, 0, 0.18);
+}
+
+.heart-main {
+    fill: #8f1d2c;
+    stroke: #ff6675;
+    stroke-width: 2.2;
+}
+
+.heart-left {
+    fill: #b42335;
+    opacity: 0.95;
+}
+
+.heart-right {
+    fill: #8a1830;
+    opacity: 0.95;
+}
+
+.heart-aorta,
+.heart-artery {
+    fill: none;
+    stroke: #ff8a94;
+    stroke-width: 7;
+    stroke-linecap: round;
+}
+
+.heart-detail {
+    fill: none;
+    stroke: rgba(255, 170, 176, 0.45);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.heart-highlight {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.22);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+#anatomicalHeartGroup {
+    transform-origin: center;
+}
+
+.heart-beating {
+    animation-name: heartBeatDynamic;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+.heart-idle {
+    animation: heartIdleSoft 2.6s ease-in-out infinite;
+}
+
+.heart-offline {
+    opacity: 0.45;
+    filter: grayscale(0.45);
+}
+
+@keyframes heartBeatDynamic {
+    0% {
+        transform: scale(1);
+    }
+
+    18% {
+        transform: scale(1.07);
+    }
+
+    36% {
+        transform: scale(0.98);
+    }
+
+    55% {
+        transform: scale(1.12);
+    }
+
+    75% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes heartIdleSoft {
+    0% {
+        transform: scale(1);
+        opacity: 0.94;
+    }
+
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.94;
+    }
+}
+
+.gemeo-heart-bpm {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #93c5fd;
+}
+
+.gemeo-heart-subtitle {
+    text-align: center;
+    font-size: 1rem;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.gemeo-heart-legend {
+    text-align: center;
+    margin-top: 10px;
+    color: #cbd5e1;
+    opacity: 0.95;
+}
+
+#anatomicalHeartGroup.heart-beating {
+    animation: heartBeatDynamic var(--duracao-batimento, 1s) ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+#anatomicalHeartGroup.heart-idle,
+#anatomicalHeartGroup.heart-offline {
+    animation: none;
+}
+
+#anatomicalHeartGroup.heart-offline {
+    opacity: 0.45;
+    filter: grayscale(0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #anatomicalHeartGroup.heart-beating {
+        animation: none !important;
+    }
+}
