@@ -16,7 +16,7 @@ const historicoDesempenho = [];
 
 function marcarInterrupcaoGrafico() {
     if (!realtimeChart || graficoEmPausa) return;
-    
+
     const qtdPontos = realtimeChart.data.datasets[0].data.length;
     if (qtdPontos === 0) return; // Não faz nada se já estiver limpo na esquerda
 
@@ -238,8 +238,8 @@ function emitirBipAlarme() {
 
         const tempoInicioBipe = inicio + (i * 0.5);
 
-        volume.gain.setValueAtTime(0.12, tempoInicioBipe); 
-        volume.gain.setValueAtTime(0.12, tempoInicioBipe + 0.15); 
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe);
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe + 0.15);
         volume.gain.linearRampToValueAtTime(0.0001, tempoInicioBipe + 0.16);
 
         oscilador.connect(volume);
@@ -1084,7 +1084,7 @@ async function encerrarMonitoramento() {
         ultimoIdPlotado = null;
         graficoEmPausa = false;
 
-       if (realtimeChart) {
+        if (realtimeChart) {
             realtimeChart.data.labels = Array(10).fill('');
             realtimeChart.data.datasets.forEach(dataset => {
                 dataset.data = [];
@@ -1233,7 +1233,7 @@ async function atualizarDadosDashboard() {
                 realtimeChart.data.datasets[1].data.shift();
                 realtimeChart.data.datasets[1].data.push(spo2);
             }
-            
+
             realtimeChart.update();
         }
 
@@ -1279,13 +1279,18 @@ function inicializarGraficoSaude() {
             maintainAspectRatio: false,
             animation: false,
             scales: {
-                y: { 
-                    beginAtZero: true, 
-                    grid: { color: '#334155' } 
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#334155' }
                 },
-                x: { 
+                x: {
                     grid: { color: '#334155' },
-                    ticks: { display: false }
+                    ticks: {
+                        display: true,
+                        color: '#94a3b8',
+                        maxRotation: 0,
+                        autoSkip: true
+                    }
                 }
             }
         }
@@ -1608,11 +1613,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(async () => {
         if (!pacienteAtivo.dispositivo) return;
 
-        await atualizarDadosDashboard(); 
+        await atualizarDadosDashboard();
 
         const abaAlarmes = document.getElementById('alarmes');
         if (abaAlarmes && abaAlarmes.classList.contains('active')) {
-            atualizarMedicoesAlarmes(); 
+            atualizarMedicoesAlarmes();
         }
     }, 2000);
 
@@ -2078,8 +2083,8 @@ function testarSomAlarmeSimulado() {
 
         const tempoInicioBipe = inicio + (i * 0.5);
 
-        volume.gain.setValueAtTime(0.12, tempoInicioBipe); 
-        volume.gain.setValueAtTime(0.12, tempoInicioBipe + 0.15); 
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe);
+        volume.gain.setValueAtTime(0.12, tempoInicioBipe + 0.15);
         volume.gain.linearRampToValueAtTime(0.0001, tempoInicioBipe + 0.16);
 
         oscilador.connect(volume);
@@ -2105,7 +2110,7 @@ async function abrirCadastroRapido() {
     if (!idade) return;
 
     // Assumimos o ESP32 padrão da bancada para agilizar
-    const dispositivo = "ESP32-BANCADA-01"; 
+    const dispositivo = "ESP32-BANCADA-01";
 
     try {
         const res = await fetch('/api/pacientes', {
@@ -2148,7 +2153,7 @@ async function trocarPacienteTopo(id) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dispositivo: pacienteAtivo.dispositivo })
             });
-        } catch(e) { console.error("Falha ao encerrar o monitoramento anterior", e); }
+        } catch (e) { console.error("Falha ao encerrar o monitoramento anterior", e); }
     }
 
     // Inicia o novo (A função original já lida com os alertas de tirar o dedo do sensor!)
