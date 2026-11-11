@@ -219,11 +219,6 @@ function emitirBipAlarme() {
         return;
     }
 
-    if (document.hidden ||
-        !document.getElementById('alarmes')?.classList.contains('active')) {
-        return;
-    }
-
     const contexto = audioContextAlarme;
     if (contexto.state !== 'running') return;
 
@@ -300,8 +295,9 @@ async function ativarSomAlarmes() {
         atualizarStatusSomAlarme();
         atualizarAlertaSonoro(alertaCriticoAtivo);
     } catch (erro) {
-        console.error('Erro ao ativar som:', erro);
-        alert('Não foi possível ativar o áudio do navegador.');
+        somAlarmeAtivado = false;
+        console.warn('Audio ainda nao liberado:', erro);
+        atualizarStatusSomAlarme();
     }
 }
 
@@ -312,18 +308,40 @@ function silenciarSomAlarmes() {
 }
 
 function inicializarControlesSomAlarmes() {
-    const ativar = document.getElementById('ativarSomAlarme');
-    const silenciar = document.getElementById('silenciarSomAlarme');
-
-    if (!ativar || !silenciar) return;
-
-    ativar.disabled = false;
-    silenciar.disabled = false;
-
-    ativar.addEventListener('click', ativarSomAlarmes);
-    silenciar.addEventListener('click', silenciarSomAlarmes);
-
     atualizarStatusSomAlarme();
+
+    async function liberarAudioAutomaticamente() {
+        try {
+            await ativarSomAlarmes();
+
+            if (somAlarmeAtivado) {
+                document.removeEventListener(
+                    'pointerdown',
+                    liberarAudioAutomaticamente
+                );
+
+                document.removeEventListener(
+                    'keydown',
+                    liberarAudioAutomaticamente
+                );
+            }
+        } catch (erro) {
+            console.error(
+                'Falha ao liberar audio:',
+                erro
+            );
+        }
+    }
+
+    document.addEventListener(
+        'pointerdown',
+        liberarAudioAutomaticamente
+    );
+
+    document.addEventListener(
+        'keydown',
+        liberarAudioAutomaticamente
+    );
 }
 
 document.addEventListener(
@@ -705,10 +723,6 @@ function switchTab(tabId, element) {
 
     if (document.body.classList.contains('modo-apresentacao')) {
         desativarModoApresentacao();
-    }
-
-    if (tabId !== 'alarmes') {
-        pararSomAlarme();
     }
 
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1097,13 +1111,7 @@ async function selecionarPacienteParaMonitorar(id, nome, idade, dispositivo) {
     }
 }
 
-
 async function encerrarMonitoramento() {
-    if (!pacienteAtivo.id) {
-        document.getElementById('seletorPacienteTopo').value = "";
-        alert('Nenhum paciente está selecionado nesta página.');
-        return;
-    }
 
     const dispositivo = pacienteAtivo.dispositivo;
 
@@ -1116,8 +1124,14 @@ async function encerrarMonitoramento() {
             body: JSON.stringify({ dispositivo })
         });
 
-        if (!resposta.ok) {
-            throw new Error('Não foi possível encerrar o monitoramento.');
+        const resultado = await resposta.json();
+
+        if (!resposta.ok ||
+            resultado.status !== 'monitoramento_encerrado') {
+            throw new Error(
+                resultado.erro ||
+                'Não foi possível encerrar o monitoramento.'
+            );
         }
 
         atualizarAlertaSonoro(false);
@@ -1131,6 +1145,14 @@ async function encerrarMonitoramento() {
             idade: '',
             dispositivo: 'ESP32-BANCADA-01'
         };
+
+        const seletorTopo = document.getElementById(
+            'seletorPacienteTopo'
+        );
+
+        if (seletorTopo) {
+            seletorTopo.value = '';
+        }
 
         ultimoIdPlotado = null;
         graficoEmPausa = false;
@@ -1157,10 +1179,12 @@ async function encerrarMonitoramento() {
         document.getElementById('alarmeBpm').textContent = '--';
         document.getElementById('alarmeSpo2').textContent = '--';
 
+        return true;
 
     } catch (erro) {
         console.error('Erro ao encerrar monitoramento:', erro);
         alert(erro.message);
+        return false;
     }
 }
 
@@ -1791,6 +1815,32 @@ async function sincronizarPacienteAtivo() {
             dispositivoElemento.textContent = pacienteAtivo.dispositivo;
         }
 
+
+        // Restaura a seleção do paciente após F5.
+        // Não inicia nem encerra uma sessão.
+        const seletorTopo = document.getElementById(
+            'seletorPacienteTopo'
+        );
+
+        if (seletorTopo) {
+            const idAtivo = pacienteAtivo.id != null
+                ? String(pacienteAtivo.id)
+                : '';
+
+            const opcaoExiste = Array.from(
+                seletorTopo.options
+            ).some(opcao => opcao.value === idAtivo);
+
+            if (opcaoExiste) {
+                seletorTopo.value = idAtivo;
+            } else {
+                console.warn(
+                    '[MONITORAMENTO] Paciente ativo não encontrado no seletor:',
+                    idAtivo
+                );
+            }
+        }
+
         const bpmElemento = document.getElementById('bpmValue');
         const spo2Elemento = document.getElementById('spo2Value');
 
@@ -1804,24 +1854,28 @@ async function sincronizarPacienteAtivo() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     inicializarGraficoSaude();
     inicializarGraficoPerformance();
     inicializarGraficoAlgoritmos();
     inicializarGraficoMemoria();
 
-    carregarPacientes();
-
-    sincronizarPacienteAtivo();
+    await carregarPacientes();
+    await sincronizarPacienteAtivo();
 
     setInterval(async () => {
         if (!pacienteAtivo.dispositivo) return;
 
-        await atualizarDadosDashboard();
+        try {
+            await atualizarDadosDashboard();
 
-        const abaAlarmes = document.getElementById('alarmes');
-        if (abaAlarmes && abaAlarmes.classList.contains('active')) {
-            atualizarMedicoesAlarmes();
+            // Verifica alarmes independentemente da aba aberta.
+            await atualizarMedicoesAlarmes();
+        } catch (erro) {
+            console.error(
+                '[BIOIOT] Falha na atualização periódica:',
+                erro
+            );
         }
     }, 2000);
 
@@ -2349,18 +2403,17 @@ async function trocarPacienteTopo(id) {
     const seletor = document.getElementById('seletorPacienteTopo');
     const opcao = seletor.options[seletor.selectedIndex];
 
-    // Se já havia um paciente ativo, o backend exige que seja encerrado primeiro
     if (pacienteAtivo.id) {
-        try {
-            await fetch('/api/monitoramento/encerrar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dispositivo: pacienteAtivo.dispositivo })
-            });
-        } catch (e) { console.error("Falha ao encerrar o monitoramento anterior", e); }
+        const encerrado = await encerrarMonitoramento();
+
+        if (!encerrado) {
+            if (seletor) {
+                seletor.value = String(pacienteAtivo.id);
+            }
+            return;
+        }
     }
 
-    // Inicia o novo (A função original já lida com os alertas de tirar o dedo do sensor!)
     await selecionarPacienteParaMonitorar(
         Number(id),
         opcao.dataset.nome,

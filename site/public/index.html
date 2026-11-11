@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bioiot-ai.css">
 </head>
 
 <body>
@@ -27,6 +28,9 @@
                 </div>
                 <div class="nav-item" onclick="switchTab('gemeo-digital', this)">
                     <i data-lucide="heart-pulse"></i> Gêmeo Digital
+                </div>
+                <div class="nav-item" onclick="switchTab('bioiot-ai', this)">
+                    <i data-lucide="brain-circuit"></i> BioIoT AI
                 </div>
                 <div class="nav-item" onclick="switchTab('pacientes', this)">
                     <i data-lucide="users"></i> Visitantes / Pacientes
@@ -407,6 +411,171 @@
 
             </section>
 
+
+            <!-- BIOIOT AI EXPERIENCE — DEMONSTRACAO CIENTIFICA -->
+            <section id="bioiot-ai" class="tab-content">
+
+                <div class="ai-experience">
+
+                    <header class="ai-header">
+                        <div>
+                            <span class="ai-eyebrow">
+                                INTELIGENCIA ARTIFICIAL EXPLICAVEL
+                            </span>
+                            <h1>BioIoT AI Experience</h1>
+                            <p>
+                                Explore padrões reais identificados por
+                                aprendizado de máquina em registros científicos.
+                            </p>
+                        </div>
+
+                        <span class="ai-mode-label">
+                            Demonstração científica
+                        </span>
+                    </header>
+
+                    <div id="ai-loading" class="ai-loading">
+                        Carregando análises científicas...
+                    </div>
+
+                    <div id="ai-content" hidden>
+
+                        <div class="ai-summary">
+                            <div class="ai-panel ai-summary-item">
+                                <span>Modelo de IA</span>
+                                <strong>Isolation Forest</strong>
+                                <small>Aprendizado não supervisionado</small>
+                            </div>
+
+                            <div class="ai-panel ai-summary-item">
+                                <span>Treinamento</span>
+                                <strong id="ai-training-count">—</strong>
+                                <small>Janelas de 60 segundos</small>
+                            </div>
+
+                            <div class="ai-panel ai-summary-item">
+                                <span>Teste separado</span>
+                                <strong id="ai-test-count">—</strong>
+                                <small>Janelas de avaliação</small>
+                            </div>
+
+                            <div class="ai-panel ai-summary-item">
+                                <span>Casos sinalizados</span>
+                                <strong id="ai-flagged-count">—</strong>
+                                <small>Não representa acurácia</small>
+                            </div>
+                        </div>
+
+                        <div class="ai-panel ai-selector-panel">
+                            <div>
+                                <h2>Explore os casos científicos</h2>
+                                <p>
+                                    Selecione uma janela histórica para
+                                    conhecer os resultados produzidos pela IA.
+                                </p>
+                            </div>
+
+                            <div id="ai-case-list" class="ai-case-list">
+                            </div>
+                        </div>
+
+                        <div class="ai-result-grid">
+
+                            <div class="ai-panel ai-analysis-panel">
+                                <div class="ai-panel-heading">
+                                    <h2 id="ai-case-title">Caso científico</h2>
+                                    <span id="ai-case-status" class="ai-result-status">
+                                        —
+                                    </span>
+                                </div>
+
+                                <p id="ai-case-period" class="ai-secondary-text"></p>
+
+                                <div class="ai-metrics">
+                                    <div class="ai-metric">
+                                        <span>Pulso médio</span>
+                                        <strong id="ai-pulse-average">—</strong>
+                                    </div>
+
+                                    <div class="ai-metric">
+                                        <span>SpO₂ média</span>
+                                        <strong id="ai-spo2-average">—</strong>
+                                    </div>
+                                </div>
+
+                                <div class="ai-score">
+                                    <span>Pontuação do modelo</span>
+                                    <strong id="ai-score-value">—</strong>
+                                    <small id="ai-score-threshold"></small>
+                                </div>
+
+                                <div class="ai-interpretation">
+                                    <h3>O que significa?</h3>
+                                    <p id="ai-interpretation-text"></p>
+                                </div>
+                            </div>
+
+                            <div class="ai-panel ai-charts-panel">
+                                <h2>Comportamento das medições</h2>
+                                <p class="ai-secondary-text">
+                                    Série temporal original de 60 segundos.
+                                </p>
+
+                                <div class="ai-chart-block">
+                                    <div class="ai-chart-heading">
+                                        <h3>Pulso</h3>
+                                        <span>BPM</span>
+                                    </div>
+                                    <svg id="ai-pulse-chart" viewBox="0 0 700 180" role="img"
+                                        aria-label="Gráfico temporal do pulso">
+                                    </svg>
+                                </div>
+
+                                <div class="ai-chart-block">
+                                    <div class="ai-chart-heading">
+                                        <h3>Oxigenação</h3>
+                                        <span>SpO₂ (%)</span>
+                                    </div>
+                                    <svg id="ai-spo2-chart" viewBox="0 0 700 180" role="img"
+                                        aria-label="Gráfico temporal da oxigenação">
+                                    </svg>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="ai-panel ai-explanation-panel">
+                            <div>
+                                <h2>Por que o modelo sinalizou?</h2>
+                                <p class="ai-secondary-text">
+                                    Investigação da sensibilidade da pontuação
+                                    às características da janela.
+                                </p>
+                            </div>
+
+                            <div id="ai-explanation-list"></div>
+
+                            <p class="ai-method-note">
+                                Método experimental: substituição individual
+                                de características pela mediana do treinamento.
+                                Não demonstra causalidade.
+                            </p>
+                        </div>
+
+                        <div class="ai-disclaimer">
+                            <i data-lucide="info"></i>
+                            Dados históricos do BIDMC/PhysioNet.
+                            Não são medições ao vivo e não representam
+                            diagnóstico, avaliação de saúde ou
+                            recomendações médicas.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
             <div id="dashboard" class="tab-content active">
                 <header>
                     <h1>Monitoramento em Tempo Real</h1>
@@ -671,18 +840,6 @@
                         O som será utilizado apenas para alertas
                         confirmados durante o monitoramento.
                     </p>
-
-                    <div style="display: flex; flex-wrap: wrap;
-                    gap: 1rem; margin-top: 1rem;">
-
-                        <button type="button" id="ativarSomAlarme" disabled>
-                            Ativar som
-                        </button>
-
-                        <button type="button" id="silenciarSomAlarme" disabled>
-                            Silenciar alarme
-                        </button>
-                    </div>
 
                     <p id="alarmeSomStatus" style="color: var(--text-muted);
                   margin-top: 1rem;">
@@ -1543,6 +1700,7 @@
     <script>
         lucide.createIcons();
     </script>
+    <script src="bioiot-ai.js" defer></script>
 </body>
 
 </html>
