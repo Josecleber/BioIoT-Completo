@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -165,12 +164,14 @@ body {
 }
 
 
-table th, table td {
+table th,
+table td {
     padding: 12px 10px;
     border-bottom: 1px solid var(--card-border);
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     outline: none;
     border-color: var(--accent-blue) !important;
 }
@@ -180,4 +181,232 @@ input:focus, select:focus {
     position: relative;
     width: 100%;
     height: 300px;
+}
+
+/* BIOIOT EXPERIENCE — GEMEO DIGITAL */
+
+.gemeo-coracao-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    gap: 24px;
+}
+
+.gemeo-coracao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+    transform-origin: center;
+    animation: pulsarGemeo 1s ease-in-out infinite;
+    animation-play-state: paused;
+}
+
+.gemeo-coracao svg {
+    width: 140px;
+    height: 140px;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.35));
+}
+
+.gemeo-coracao.ativo {
+    animation-play-state: running;
+}
+
+.gemeo-ritmo {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@keyframes pulsarGemeo {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: scale(1.17);
+    }
+
+    60% {
+        transform: scale(1.03);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gemeo-coracao {
+        animation: none;
+    }
+}
+
+
+/* BIOIOT EXPERIENCE — FLUXO DE DADOS */
+
+.fluxo-bioiot-card {
+    margin-top: 24px;
+}
+
+.fluxo-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.fluxo-cabecalho p,
+.fluxo-observacao {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.fluxo-status {
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #334155;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.fluxo-bioiot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+}
+
+.fluxo-etapa {
+    flex: 1;
+    min-width: 0;
+    min-height: 156px;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 9px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    transition: border-color 0.3s, background 0.3s;
+}
+
+.fluxo-etapa svg {
+    width: 28px;
+    height: 28px;
+    color: #94a3b8;
+}
+
+.fluxo-etapa strong {
+    font-size: 14px;
+    color: #f8fafc;
+}
+
+.fluxo-etapa small {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.fluxo-etapa-estado {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.fluxo-etapa.ativo {
+    border-color: #38bdf8;
+    background: #10283c;
+}
+
+.fluxo-etapa.ativo svg {
+    color: #38bdf8;
+}
+
+.fluxo-etapa.sucesso {
+    border-color: #10b981;
+    background: #102b29;
+}
+
+.fluxo-etapa.sucesso svg {
+    color: #10b981;
+}
+
+.fluxo-etapa.inativo {
+    opacity: 0.55;
+}
+
+.fluxo-conexao {
+    width: 25px;
+    height: 3px;
+    flex-shrink: 0;
+    background: #334155;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.fluxo-conexao span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #38bdf8;
+    transform: translateX(-100%);
+}
+
+.fluxo-bioiot.transmitindo .fluxo-conexao span {
+    animation: fluxoTransmitir 1.8s ease-in-out infinite;
+}
+
+@keyframes fluxoTransmitir {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.fluxo-rodape {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.fluxo-observacao {
+    margin-top: 16px;
+}
+
+@media (max-width: 1100px) {
+    .fluxo-bioiot {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .fluxo-etapa {
+        flex: 1 1 140px;
+    }
+
+    .fluxo-conexao {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fluxo-conexao span {
+        animation: none !important;
+    }
 }

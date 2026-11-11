@@ -1113,6 +1113,157 @@ async function encerrarMonitoramento() {
     }
 }
 
+
+function atualizarFluxoBioIoT(bpm, spo2, online) {
+    const fluxo = document.getElementById('fluxoBioIoT');
+    const status = document.getElementById('fluxoStatusGeral');
+
+    if (!fluxo || !status) return;
+
+    const ids = [
+        'fluxoESP32',
+        'fluxoWifi',
+        'fluxoServidor',
+        'fluxoSQLite',
+        'fluxoDashboard'
+    ];
+
+    const etapas = ids.map(id => document.getElementById(id));
+
+    const modoLivre = pacienteAtivo.id == null;
+    const leituraValida =
+        online &&
+        Number.isFinite(bpm) &&
+        Number.isFinite(spo2) &&
+        bpm > 0 &&
+        spo2 > 0;
+
+    const estados = online
+        ? [
+            'Conectado',
+            'Comunicação recente',
+            'Respondendo',
+            modoLivre ? 'Não utilizado' : 'Registro por paciente',
+            leituraValida ? 'Leitura exibida' : 'Aguardando leitura'
+        ]
+        : [
+            'Sem sinal',
+            'Sem comunicação recente',
+            'Aguardando',
+            'Não confirmado',
+            'Sem leitura'
+        ];
+
+    etapas.forEach((etapa, indice) => {
+        if (!etapa) return;
+
+        etapa.classList.remove('ativo', 'sucesso', 'inativo');
+
+        const texto = etapa.querySelector('.fluxo-etapa-estado');
+        if (texto) texto.textContent = estados[indice];
+
+        if (!online) {
+            etapa.classList.add('inativo');
+        } else if (indice === 3 && modoLivre) {
+            etapa.classList.add('inativo');
+        } else if (indice === 4 && !leituraValida) {
+            etapa.classList.add('inativo');
+        } else {
+            etapa.classList.add('sucesso');
+        }
+    });
+
+    // Animação ilustrativa somente com leitura válida.
+    fluxo.classList.toggle('transmitindo', leituraValida);
+
+    if (!online) {
+        status.textContent = 'ESP32 sem sinal';
+    } else if (leituraValida) {
+        status.textContent = 'Medição recebida';
+    } else if (bpm === -1 || spo2 === -1) {
+        status.textContent = 'Sensor calculando';
+    } else {
+        status.textContent = 'Aguardando dedo';
+    }
+
+    const dispositivo = document.getElementById('fluxoDispositivo');
+    const modo = document.getElementById('fluxoModo');
+    const ultima = document.getElementById('fluxoUltimaLeitura');
+
+    if (dispositivo) {
+        dispositivo.textContent =
+            `Dispositivo: ${pacienteAtivo.dispositivo}`;
+    }
+
+    if (modo) {
+        modo.textContent =
+            `Modo: ${modoLivre ? 'Livre' : 'Paciente monitorado'}`;
+    }
+
+    if (ultima && leituraValida) {
+        ultima.textContent =
+            `Última consulta: ${new Date().toLocaleTimeString('pt-BR')}`;
+    } else if (ultima && !online) {
+        ultima.textContent = 'Última consulta: sem sinal';
+    }
+}
+
+function atualizarGemeoDigital(bpm, spo2, online = true) {
+    const coracao = document.getElementById('coracaoDigital');
+    const campoBpm = document.getElementById('gemeoBpm');
+    const campoSpo2 = document.getElementById('gemeoSpo2');
+    const campoEstado = document.getElementById('gemeoEstado');
+    const campoRitmo = document.getElementById('gemeoRitmo');
+
+    if (!coracao) return;
+
+    atualizarFluxoBioIoT(bpm, spo2, online);
+
+    if (!online) {
+        coracao.classList.remove('ativo');
+
+        campoBpm.textContent = '-- BPM';
+        campoSpo2.textContent = '-- %';
+        campoEstado.textContent = 'Sem sinal';
+        campoRitmo.textContent = 'ESP32 desconectado';
+
+        return;
+    }
+
+    if (bpm === -1 || spo2 === -1) {
+        coracao.classList.remove('ativo');
+
+        campoBpm.textContent = '-- BPM';
+        campoSpo2.textContent = '-- %';
+        campoEstado.textContent = 'Calculando';
+        campoRitmo.textContent = 'Aguardando cálculo do sensor';
+
+        return;
+    }
+
+    if (!Number.isFinite(bpm) || !Number.isFinite(spo2) ||
+        bpm <= 0 || spo2 <= 0) {
+        coracao.classList.remove('ativo');
+
+        campoBpm.textContent = '-- BPM';
+        campoSpo2.textContent = '-- %';
+        campoEstado.textContent = 'Sem medição';
+        campoRitmo.textContent = 'Posicione o dedo no sensor';
+
+        return;
+    }
+
+    const intervalo = 60 / bpm;
+
+    coracao.style.animationDuration = `${intervalo}s`;
+    coracao.classList.add('ativo');
+
+    campoBpm.textContent = `${bpm} BPM`;
+    campoSpo2.textContent = `${spo2} %`;
+    campoEstado.textContent = 'Leitura disponível';
+    campoRitmo.textContent = `${bpm} pulsações por minuto`;
+}
+
 async function atualizarDadosDashboard() {
     if (!pacienteAtivo.dispositivo) return;
 
@@ -1127,6 +1278,7 @@ async function atualizarDadosDashboard() {
         const statusESP = await respostaStatus.json();
 
         if (!statusESP.online) {
+            atualizarGemeoDigital(0, 0, false);
             marcarInterrupcaoGrafico();
 
             document.getElementById('bpmValue').textContent = '--';
@@ -1150,6 +1302,7 @@ async function atualizarDadosDashboard() {
         const bpm = dados.bpm || 0;
         const spo2 = dados.spo2 || 0;
 
+        atualizarGemeoDigital(bpm, spo2, true);
 
         const bpmStatus = document.getElementById('bpmStatus');
         const spo2Status = document.getElementById('spo2Status');
