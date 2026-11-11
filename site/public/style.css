@@ -410,3 +410,239 @@ select:focus {
         animation: none !important;
     }
 }
+
+.gemeo-heart-card {
+    min-height: 320px;
+}
+
+.gemeo-heart-stage {
+    position: relative;
+    height: 230px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.heart-wrapper {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.heart-svg {
+    width: 180px;
+    height: 180px;
+    filter: drop-shadow(0 0 18px rgba(255, 80, 80, 0.18));
+}
+
+.heart-body {
+    stroke: #ff4d5a;
+    stroke-width: 3.2;
+    fill: rgba(255, 77, 90, 0.08);
+}
+
+.heart-line {
+    stroke: #ff4d5a;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 77, 90, 0.15);
+    opacity: 0;
+    transform: scale(0.7);
+}
+
+.pulse-ring-1 {
+    animation: ringPulse 2s infinite;
+}
+
+.pulse-ring-2 {
+    animation: ringPulse 2s infinite 1s;
+}
+
+@keyframes ringPulse {
+    0% {
+        transform: scale(0.7);
+        opacity: 0.0;
+    }
+
+    20% {
+        opacity: 0.35;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.heart-beating {
+    animation: heartBeatCustom 1s ease-in-out infinite;
+    animation-duration: var(--heart-duration, 1s);
+}
+
+@keyframes heartBeatCustom {
+    0% {
+        transform: scale(1);
+    }
+
+    18% {
+        transform: scale(1.08);
+    }
+
+    36% {
+        transform: scale(0.98);
+    }
+
+    54% {
+        transform: scale(1.1);
+    }
+
+    72% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.heart-idle {
+    animation: none;
+    opacity: 0.85;
+}
+
+.heart-offline {
+    animation: none;
+    opacity: 0.45;
+    filter: grayscale(0.7);
+}
+
+@keyframes heartIdle {
+    0% {
+        transform: scale(1);
+        opacity: 0.92;
+    }
+
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.92;
+    }
+}
+
+.heart-offline {
+    opacity: 0.6;
+    filter: grayscale(0.25);
+}
+
+.gemeo-heart-bpm {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #8fb8ff;
+}
+
+.gemeo-heart-subtitle {
+    text-align: center;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+.pulse-ring {
+    animation: none;
+}
+
+.gemeo-heart-stage.medindo .pulse-ring-1 {
+    animation: ringPulse var(--heart-duration, 1s) ease-out infinite;
+}
+
+.gemeo-heart-stage.medindo .pulse-ring-2 {
+    animation: ringPulse var(--heart-duration, 1s) ease-out infinite;
+    animation-delay: calc(var(--heart-duration, 1s) / -2);
+}
+
+@media (max-width: 600px) {
+    .gemeo-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gemeo-metric-box-full {
+        grid-column: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .heart-wrapper,
+    .pulse-ring {
+        animation: none !important;
+    }
+}
+
+.gemeo-data-card {
+    min-height: 320px;
+}
+
+.gemeo-metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.gemeo-metric-box {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 22px;
+}
+
+.gemeo-metric-box-full {
+    grid-column: 1 / -1;
+}
+
+.gemeo-metric-label {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.gemeo-metric-box strong {
+    display: block;
+    font-size: 24px;
+    line-height: 1.35;
+}
+
+.gemeo-bpm-valor {
+    color: #f43f5e;
+}
+
+.gemeo-spo2-valor {
+    color: #38bdf8;
+}
+
+@media (max-width: 600px) {
+    .gemeo-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gemeo-metric-box-full {
+        grid-column: auto;
+    }
+}

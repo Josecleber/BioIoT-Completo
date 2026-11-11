@@ -1113,7 +1113,6 @@ async function encerrarMonitoramento() {
     }
 }
 
-
 function atualizarFluxoBioIoT(bpm, spo2, online) {
     const fluxo = document.getElementById('fluxoBioIoT');
     const status = document.getElementById('fluxoStatusGeral');
@@ -1208,19 +1207,39 @@ function atualizarFluxoBioIoT(bpm, spo2, online) {
     }
 }
 
+
 function atualizarGemeoDigital(bpm, spo2, online = true) {
-    const coracao = document.getElementById('coracaoDigital');
+    const coracao = document.getElementById('heartWrapper');
+    const palco = document.getElementById('gemeoHeartStage');
+
     const campoBpm = document.getElementById('gemeoBpm');
     const campoSpo2 = document.getElementById('gemeoSpo2');
     const campoEstado = document.getElementById('gemeoEstado');
-    const campoRitmo = document.getElementById('gemeoRitmo');
+    const campoRitmo = document.getElementById('gemeoHeartBpmText');
 
-    if (!coracao) return;
-
+    // Atualiza o fluxo de dados existente.
     atualizarFluxoBioIoT(bpm, spo2, online);
 
+    if (
+        !coracao ||
+        !palco ||
+        !campoBpm ||
+        !campoSpo2 ||
+        !campoEstado ||
+        !campoRitmo
+    ) {
+        return;
+    }
+
+    // ESP32 desconectado
     if (!online) {
-        coracao.classList.remove('ativo');
+        coracao.classList.remove(
+            'heart-beating',
+            'heart-idle'
+        );
+
+        coracao.classList.add('heart-offline');
+        palco.classList.remove('medindo');
 
         campoBpm.textContent = '-- BPM';
         campoSpo2.textContent = '-- %';
@@ -1230,20 +1249,41 @@ function atualizarGemeoDigital(bpm, spo2, online = true) {
         return;
     }
 
+    // Sensor calculando
     if (bpm === -1 || spo2 === -1) {
-        coracao.classList.remove('ativo');
+        coracao.classList.remove(
+            'heart-beating',
+            'heart-offline'
+        );
+
+        coracao.classList.add('heart-idle');
+        palco.classList.remove('medindo');
 
         campoBpm.textContent = '-- BPM';
         campoSpo2.textContent = '-- %';
         campoEstado.textContent = 'Calculando';
-        campoRitmo.textContent = 'Aguardando cálculo do sensor';
+        campoRitmo.textContent = 'Calculando leitura...';
 
         return;
     }
 
-    if (!Number.isFinite(bpm) || !Number.isFinite(spo2) ||
-        bpm <= 0 || spo2 <= 0) {
-        coracao.classList.remove('ativo');
+    // Sem dedo ou leitura inválida
+    const leituraValida =
+        Number.isInteger(bpm) &&
+        Number.isInteger(spo2) &&
+        bpm >= 40 &&
+        bpm <= 160 &&
+        spo2 >= 75 &&
+        spo2 <= 100;
+
+    if (!leituraValida) {
+        coracao.classList.remove(
+            'heart-beating',
+            'heart-offline'
+        );
+
+        coracao.classList.add('heart-idle');
+        palco.classList.remove('medindo');
 
         campoBpm.textContent = '-- BPM';
         campoSpo2.textContent = '-- %';
@@ -1253,15 +1293,28 @@ function atualizarGemeoDigital(bpm, spo2, online = true) {
         return;
     }
 
+    // Medição real disponível
     const intervalo = 60 / bpm;
 
-    coracao.style.animationDuration = `${intervalo}s`;
-    coracao.classList.add('ativo');
+    // Ajusta a duração da animação ao BPM.
+    palco.style.setProperty(
+        '--heart-duration',
+        `${intervalo}s`
+    );
+
+    coracao.classList.remove(
+        'heart-idle',
+        'heart-offline'
+    );
+
+    coracao.classList.add('heart-beating');
+    palco.classList.add('medindo');
 
     campoBpm.textContent = `${bpm} BPM`;
     campoSpo2.textContent = `${spo2} %`;
     campoEstado.textContent = 'Leitura disponível';
-    campoRitmo.textContent = `${bpm} pulsações por minuto`;
+    campoRitmo.textContent =
+        `${bpm} pulsações por minuto`;
 }
 
 async function atualizarDadosDashboard() {
@@ -2317,3 +2370,4 @@ async function trocarPacienteTopo(id) {
         opcao.dataset.dispositivo
     );
 }
+

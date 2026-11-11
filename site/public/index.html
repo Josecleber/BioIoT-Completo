@@ -81,36 +81,69 @@
 
                 <div class="grid-cards">
 
-                    <div class="card">
+                    <div class="card gemeo-heart-card">
                         <h3>Representação do coração</h3>
 
-                        <div class="gemeo-coracao-container">
-                            <div id="coracaoDigital" class="gemeo-coracao">
-                                <i data-lucide="heart-pulse"></i>
-                            </div>
+                        <div class="gemeo-heart-stage" id="gemeoHeartStage">
+                            <div class="pulse-ring pulse-ring-1"></div>
+                            <div class="pulse-ring pulse-ring-2"></div>
 
-                            <span id="gemeoRitmo" class="gemeo-ritmo">
-                                Aguardando medição
-                            </span>
+                            <div class="heart-wrapper" id="heartWrapper">
+                                <svg class="heart-svg" viewBox="0 0 64 64" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M32 56C31 56 30 55.6 29.2 54.8L11.7 37.9C6.6 33 4 28.8 4 23.8C4 15.8 10 10 17.8 10C22.2 10 26.4 12 29.2 15.2L32 18.3L34.8 15.2C37.6 12 41.8 10 46.2 10C54 10 60 15.8 60 23.8C60 28.8 57.4 33 52.3 37.9L34.8 54.8C34 55.6 33 56 32 56Z"
+                                        class="heart-body" />
+                                    <path d="M16 33H24L28 25L34 41L39 30H48" class="heart-line" />
+                                </svg>
+                            </div>
                         </div>
 
-                        <p style="text-align:center;">
-                            Animação sincronizada com as medições do sensor.
-                        </p>
+                        <p class="gemeo-heart-bpm" id="gemeoHeartBpmText">Posicione o dedo no sensor</p>
+                        <p class="gemeo-heart-subtitle">Animação sincronizada com as medições do sensor.</p>
                     </div>
 
-                    <div class="card">
+
+                    <div class="card gemeo-data-card">
                         <h3>Dados em tempo real</h3>
 
-                        <p>Batimentos: <strong id="gemeoBpm">-- BPM</strong></p>
-                        <p>Oxigenação: <strong id="gemeoSpo2">-- %</strong></p>
-                        <p>Estado: <strong id="gemeoEstado">Aguardando leitura</strong></p>
+                        <div class="gemeo-metric-grid">
+
+                            <div class="gemeo-metric-box">
+                                <span class="gemeo-metric-label">
+                                    BATIMENTOS CARDÍACOS
+                                </span>
+
+                                <strong id="gemeoBpm" class="gemeo-bpm-valor">
+                                    -- BPM
+                                </strong>
+                            </div>
+
+                            <div class="gemeo-metric-box">
+                                <span class="gemeo-metric-label">
+                                    OXIGENAÇÃO (SpO₂)
+                                </span>
+
+                                <strong id="gemeoSpo2" class="gemeo-spo2-valor">
+                                    -- %
+                                </strong>
+                            </div>
+
+                            <div class="gemeo-metric-box gemeo-metric-box-full">
+                                <span class="gemeo-metric-label">
+                                    ESTADO DO MONITORAMENTO
+                                </span>
+
+                                <strong id="gemeoEstado">
+                                    Aguardando leitura
+                                </strong>
+                            </div>
+
+                        </div>
                     </div>
 
                 </div>
 
-
-                <!-- BIOIOT EXPERIENCE - FLUXO DE DADOS -->
                 <div class="card fluxo-bioiot-card">
                     <div class="fluxo-cabecalho">
                         <div>
