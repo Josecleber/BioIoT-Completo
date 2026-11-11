@@ -933,3 +933,143 @@ body.modo-apresentacao .fluxo-etapa {
         font-size: 1.8rem;
     }
 }
+
+
+/* BIOIOT — CORAÇÃO ANATÔMICO REFINADO */
+
+.anatomical-heart-shell {
+    width: 240px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.anatomical-heart-svg {
+    width: 220px;
+    height: 250px;
+    overflow: visible;
+    filter: drop-shadow(0 0 18px rgba(198, 38, 65, .18));
+}
+
+#anatomicalHeartGroup {
+    transform-box: fill-box;
+    transform-origin: center 48%;
+}
+
+#anatomicalHeartGroup.heart-beating {
+    animation: batimentoAnatomico var(--duracao-batimento, 1s) ease-in-out infinite;
+}
+
+#anatomicalHeartGroup.heart-idle {
+    animation: none;
+    opacity: .92;
+}
+
+#anatomicalHeartGroup.heart-offline {
+    animation: none;
+    opacity: .40;
+    filter: grayscale(.8);
+}
+
+@keyframes batimentoAnatomico {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    18% {
+        transform: scale(1.065) rotate(-1deg);
+    }
+
+    34% {
+        transform: scale(.985) rotate(0deg);
+    }
+
+    49% {
+        transform: scale(1.035) rotate(.5deg);
+    }
+
+    70% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Aumenta proporcionalmente no Modo Apresentação */
+
+body.modo-apresentacao .anatomical-heart-shell {
+    width: 300px;
+    height: 310px;
+}
+
+body.modo-apresentacao .anatomical-heart-svg {
+    width: 270px;
+    height: 305px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #anatomicalHeartGroup.heart-beating {
+        animation: none !important;
+    }
+}
+
+/* BIOIOT — AJUSTE FINAL DO CORAÇÃO ANATÔMICO */
+
+.gemeo-heart-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.gemeo-heart-stage {
+    height: auto;
+    min-height: 315px;
+    padding: 16px 0 12px;
+    overflow: visible;
+}
+
+.anatomical-heart-shell {
+    width: 230px;
+    height: 240px;
+    flex-shrink: 0;
+}
+
+.anatomical-heart-svg {
+    width: 205px;
+    height: 230px;
+}
+
+.gemeo-heart-bpm {
+    margin-top: 8px;
+    line-height: 1.3;
+}
+
+.gemeo-heart-subtitle {
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+/* Ajustes específicos do Modo Apresentação */
+
+body.modo-apresentacao .gemeo-heart-stage {
+    min-height: 360px;
+    padding: 10px 0 12px;
+}
+
+body.modo-apresentacao .anatomical-heart-shell {
+    width: 255px;
+    height: 255px;
+}
+
+body.modo-apresentacao .anatomical-heart-svg {
+    width: 230px;
+    height: 250px;
+}
+
+body.modo-apresentacao .gemeo-heart-bpm {
+    margin-top: 8px;
+}
+
+body.modo-apresentacao .gemeo-heart-subtitle {
+    margin-top: 4px;
+}
