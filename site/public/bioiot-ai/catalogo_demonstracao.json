@@ -1,0 +1,184 @@
+{
+  "titulo": "BioIoT AI - Laboratorio Experimental",
+  "origem": "BIDMC - PhysioNet",
+  "modelo": "Isolation Forest",
+  "janelas_treinamento": 326,
+  "janelas_teste": 88,
+  "total_sinalizadas_teste": 4,
+  "metodo_explicacao": "Teste de sensibilidade por substituicao individual pela mediana de treino",
+  "aviso": "Resultados estatisticos experimentais. Nao representam diagnosticos ou avaliacao clinica.",
+  "casos": [
+    {
+      "id": "bidmc_12_Numerics.csv_180",
+      "arquivo": "bidmc_12_Numerics.csv",
+      "inicio_segundo": 180.0,
+      "duracao_segundos": 60,
+      "tipo": "padrao_atipico",
+      "score": -0.5692149091444877,
+      "limiar": -0.557569748563179,
+      "pulse_media": 92.1,
+      "pulse_desvio": 1.46856,
+      "pulse_amplitude": 5.0,
+      "spo2_media": 95.96667,
+      "spo2_minimo": 92.0,
+      "spo2_amplitude": 7.0,
+      "sensibilidade": [
+        {
+          "caracteristica": "spo2_amplitude",
+          "valor_original": 7.0,
+          "mediana_treino": 1.0,
+          "mudanca_score": 0.05875566943580357
+        },
+        {
+          "caracteristica": "spo2_desvio",
+          "valor_original": 1.31614,
+          "mediana_treino": 0.31507,
+          "mudanca_score": 0.0348022421437173
+        },
+        {
+          "caracteristica": "spo2_tendencia",
+          "valor_original": 0.0339,
+          "mediana_treino": 0.0,
+          "mudanca_score": 0.028107523498767772
+        }
+      ]
+    },
+    {
+      "id": "bidmc_17_Numerics.csv_60",
+      "arquivo": "bidmc_17_Numerics.csv",
+      "inicio_segundo": 60.0,
+      "duracao_segundos": 60,
+      "tipo": "padrao_atipico",
+      "score": -0.586156273756608,
+      "limiar": -0.557569748563179,
+      "pulse_media": 77.18333,
+      "pulse_desvio": 5.98468,
+      "pulse_amplitude": 19.0,
+      "spo2_media": 92.75,
+      "spo2_minimo": 92.0,
+      "spo2_amplitude": 2.0,
+      "sensibilidade": [
+        {
+          "caracteristica": "pulse_desvio",
+          "valor_original": 5.98468,
+          "mediana_treino": 0.723705,
+          "mudanca_score": 0.03846228397645768
+        },
+        {
+          "caracteristica": "pulse_amplitude",
+          "valor_original": 19.0,
+          "mediana_treino": 2.0,
+          "mudanca_score": 0.03615917300117388
+        },
+        {
+          "caracteristica": "spo2_tendencia",
+          "valor_original": -0.0339,
+          "mediana_treino": 0.0,
+          "mudanca_score": 0.03595651351931495
+        }
+      ]
+    },
+    {
+      "id": "bidmc_22_Numerics.csv_0",
+      "arquivo": "bidmc_22_Numerics.csv",
+      "inicio_segundo": 0.0,
+      "duracao_segundos": 60,
+      "tipo": "padrao_atipico",
+      "score": -0.6158306882472512,
+      "limiar": -0.557569748563179,
+      "pulse_media": 81.31667,
+      "pulse_desvio": 2.52647,
+      "pulse_amplitude": 11.0,
+      "spo2_media": 91.43333,
+      "spo2_minimo": 88.0,
+      "spo2_amplitude": 6.0,
+      "sensibilidade": [
+        {
+          "caracteristica": "spo2_amplitude",
+          "valor_original": 6.0,
+          "mediana_treino": 1.0,
+          "mudanca_score": 0.044981012143497257
+        },
+        {
+          "caracteristica": "pulse_tendencia",
+          "valor_original": 0.18644,
+          "mediana_treino": 0.0,
+          "mudanca_score": 0.026252726025351225
+        },
+        {
+          "caracteristica": "spo2_desvio",
+          "valor_original": 0.9724,
+          "mediana_treino": 0.31507,
+          "mudanca_score": 0.02271893392146418
+        }
+      ]
+    },
+    {
+      "id": "bidmc_39_Numerics.csv_-0",
+      "arquivo": "bidmc_39_Numerics.csv",
+      "inicio_segundo": -0.0,
+      "duracao_segundos": 60,
+      "tipo": "padrao_atipico",
+      "score": -0.6384637095467325,
+      "limiar": -0.557569748563179,
+      "pulse_media": 42.65,
+      "pulse_desvio": 6.31882,
+      "pulse_amplitude": 30.0,
+      "spo2_media": 97.73333,
+      "spo2_minimo": 97.0,
+      "spo2_amplitude": 1.0,
+      "sensibilidade": [
+        {
+          "caracteristica": "pulse_amplitude",
+          "valor_original": 30.0,
+          "mediana_treino": 2.0,
+          "mudanca_score": 0.04090135441717946
+        },
+        {
+          "caracteristica": "pulse_tendencia",
+          "valor_original": 0.37288,
+          "mediana_treino": 0.0,
+          "mudanca_score": 0.02965471359292282
+        },
+        {
+          "caracteristica": "pulse_desvio",
+          "valor_original": 6.31882,
+          "mediana_treino": 0.723705,
+          "mudanca_score": 0.02834840783664161
+        }
+      ]
+    },
+    {
+      "id": "bidmc_04_Numerics.csv_180",
+      "arquivo": "bidmc_04_Numerics.csv",
+      "inicio_segundo": 180.0,
+      "duracao_segundos": 60,
+      "tipo": "nao_sinalizado",
+      "score": -0.43112825053667464,
+      "limiar": -0.557569748563179,
+      "pulse_media": 94.08333,
+      "pulse_desvio": 0.78085,
+      "pulse_amplitude": 2.0,
+      "spo2_media": 93.0,
+      "spo2_minimo": 93.0,
+      "spo2_amplitude": 0.0,
+      "sensibilidade": []
+    },
+    {
+      "id": "bidmc_50_Numerics.csv_180",
+      "arquivo": "bidmc_50_Numerics.csv",
+      "inicio_segundo": 180.0,
+      "duracao_segundos": 60,
+      "tipo": "nao_sinalizado",
+      "score": -0.43158968002158404,
+      "limiar": -0.557569748563179,
+      "pulse_media": 75.63333,
+      "pulse_desvio": 0.98263,
+      "pulse_amplitude": 3.0,
+      "spo2_media": 98.01667,
+      "spo2_minimo": 98.0,
+      "spo2_amplitude": 1.0,
+      "sensibilidade": []
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+dados/
+modelos/
+resultados/
+__pycache__/
+.venv/
