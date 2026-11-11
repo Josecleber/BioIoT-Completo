@@ -663,7 +663,50 @@ function atualizarPacienteAlarmes() {
         `Paciente: ${pacienteAtivo.nome} | Dispositivo: ${pacienteAtivo.dispositivo}`;
 }
 
+
+// BIOIOT EXPERIENCE — MODO APRESENTAÇÃO
+
+function atualizarBotoesApresentacao(ativo) {
+    const iniciar = document.getElementById('btnModoApresentacao');
+    const sair = document.getElementById('btnSairApresentacao');
+
+    if (iniciar) iniciar.hidden = ativo;
+    if (sair) sair.hidden = !ativo;
+}
+
+function ativarModoApresentacao() {
+    const aba = document.getElementById('gemeo-digital');
+
+    if (!aba) return;
+
+    document.body.classList.add('modo-apresentacao');
+
+    atualizarBotoesApresentacao(true);
+
+    // Solicita tela cheia, quando permitida pelo navegador.
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {
+            // Continua funcionando mesmo sem tela cheia.
+        });
+    }
+}
+
+function desativarModoApresentacao() {
+    document.body.classList.remove('modo-apresentacao');
+
+    atualizarBotoesApresentacao(false);
+
+    if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => { });
+    }
+}
+
 function switchTab(tabId, element) {
+
+    if (document.body.classList.contains('modo-apresentacao')) {
+        desativarModoApresentacao();
+    }
+
     if (tabId !== 'alarmes') {
         pararSomAlarme();
     }
@@ -684,6 +727,14 @@ function switchTab(tabId, element) {
         });
     }
 }
+
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement &&
+        document.body.classList.contains('modo-apresentacao')) {
+        document.body.classList.remove('modo-apresentacao');
+        atualizarBotoesApresentacao(false);
+    }
+});
 
 async function verificarStatusConexaoESP() {
     try {

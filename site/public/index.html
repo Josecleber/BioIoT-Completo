@@ -69,32 +69,45 @@
 
             </div>
 
-            <!-- BIOIOT EXPERIENCE - GEMEO DIGITAL -->
             <section id="gemeo-digital" class="tab-content">
 
-                <header>
-                    <h1>Gêmeo Digital</h1>
-                    <p>
-                        Visualização interativa das medições recebidas do ESP32.
-                    </p>
+                <header class="gemeo-header">
+                    <div>
+                        <h1>Gêmeo Digital</h1>
+                        <p>Visualização interativa das medições recebidas do ESP32.</p>
+                    </div>
+
+                    <div class="gemeo-acoes">
+                        <button type="button" id="btnModoApresentacao" class="btn-apresentacao"
+                            onclick="ativarModoApresentacao()">
+                            <i data-lucide="maximize"></i>
+                            Modo Apresentação
+                        </button>
+
+                        <button type="button" id="btnSairApresentacao" class="btn-sair-apresentacao"
+                            onclick="desativarModoApresentacao()" hidden>
+                            <i data-lucide="minimize"></i>
+                            Sair da Apresentação
+                        </button>
+                    </div>
                 </header>
 
                 <div class="grid-cards">
 
                     <div class="card gemeo-heart-card">
-                    <h3>Representação do coração</h3>
+                        <h3>Representação do coração</h3>
 
-                    <div class="gemeo-heart-stage">
-                        <div class="anatomical-heart-shell" id="anatomicalHeartShell">
-                            <svg id="anatomicalHeartSvg" class="anatomical-heart-svg" viewBox="0 0 220 220"
-                                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <!-- sombra -->
-                                <ellipse cx="110" cy="184" rx="42" ry="12" class="heart-shadow"></ellipse>
+                        <div class="gemeo-heart-stage">
+                            <div class="anatomical-heart-shell" id="anatomicalHeartShell">
+                                <svg id="anatomicalHeartSvg" class="anatomical-heart-svg" viewBox="0 0 220 220"
+                                    xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <!-- sombra -->
+                                    <ellipse cx="110" cy="184" rx="42" ry="12" class="heart-shadow"></ellipse>
 
-                                <!-- grupo principal -->
-                                <g id="anatomicalHeartGroup" class="heart-idle">
-                                    <!-- base do coração -->
-                                    <path class="heart-main" d="M111 52
+                                    <!-- grupo principal -->
+                                    <g id="anatomicalHeartGroup" class="heart-idle">
+                                        <!-- base do coração -->
+                                        <path class="heart-main" d="M111 52
                            C126 28, 164 30, 177 58
                            C191 88, 171 120, 147 142
                            C130 158, 121 171, 113 184
@@ -102,1302 +115,1315 @@
                            C49 120, 29 88, 43 58
                            C56 31, 94 28, 111 52Z" />
 
-                                    <!-- volume esquerdo -->
-                                    <path class="heart-left" d="M107 63
+                                        <!-- volume esquerdo -->
+                                        <path class="heart-left" d="M107 63
                            C95 48, 73 48, 61 63
                            C47 80, 50 106, 73 126
                            C86 137, 98 149, 108 166
                            C109 147, 108 125, 107 63Z" />
 
-                                    <!-- volume direito -->
-                                    <path class="heart-right" d="M112 59
+                                        <!-- volume direito -->
+                                        <path class="heart-right" d="M112 59
                            C124 42, 149 42, 163 60
                            C179 80, 175 109, 152 130
                            C136 145, 122 160, 112 182
                            C112 156, 112 122, 112 59Z" />
 
-                                    <!-- aorta -->
-                                    <path class="heart-aorta" d="M118 48
+                                        <!-- aorta -->
+                                        <path class="heart-aorta" d="M118 48
                            C119 34, 128 24, 141 22
                            C154 20, 163 26, 166 36
                            C168 46, 163 55, 154 60
                            C145 64, 134 63, 126 59" />
 
-                                    <!-- artéria secundária -->
-                                    <path class="heart-artery" d="M97 52
+                                        <!-- artéria secundária -->
+                                        <path class="heart-artery" d="M97 52
                            C92 39, 84 31, 72 30
                            C61 29, 54 36, 53 45
                            C52 56, 60 63, 70 67" />
 
-                                    <!-- sulco / detalhe -->
-                                    <path class="heart-detail" d="M118 74
+                                        <!-- sulco / detalhe -->
+                                        <path class="heart-detail" d="M118 74
                            C130 90, 132 117, 119 146" />
 
-                                    <!-- brilho -->
-                                    <path class="heart-highlight" d="M84 68
+                                        <!-- brilho -->
+                                        <path class="heart-highlight" d="M84 68
                            C73 77, 70 93, 75 106" />
-                                </g>
-                            </svg>
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <div id="gemeoHeartBpm" class="gemeo-heart-bpm">-- BPM</div>
+                            <div id="gemeoHeartStatus" class="gemeo-heart-subtitle">Posicione o dedo no sensor</div>
                         </div>
 
-                        <div id="gemeoHeartBpm" class="gemeo-heart-bpm">-- BPM</div>
-                        <div id="gemeoHeartStatus" class="gemeo-heart-subtitle">Posicione o dedo no sensor</div>
+                        <p class="gemeo-heart-legend">
+                            Animação sincronizada com as medições do sensor.
+                        </p>
                     </div>
 
-                    <p class="gemeo-heart-legend">
-                        Animação sincronizada com as medições do sensor.
+                    <div class="card gemeo-data-card">
+                        <h3>Dados em tempo real</h3>
+
+                        <div class="gemeo-metric-grid">
+
+                            <div class="gemeo-metric-box">
+                                <span class="gemeo-metric-label">
+                                    BATIMENTOS CARDÍACOS
+                                </span>
+
+                                <strong id="gemeoBpm" class="gemeo-bpm-valor">
+                                    -- BPM
+                                </strong>
+                            </div>
+
+                            <div class="gemeo-metric-box">
+                                <span class="gemeo-metric-label">
+                                    OXIGENAÇÃO (SpO₂)
+                                </span>
+
+                                <strong id="gemeoSpo2" class="gemeo-spo2-valor">
+                                    -- %
+                                </strong>
+                            </div>
+
+                            <div class="gemeo-metric-box gemeo-metric-box-full">
+                                <span class="gemeo-metric-label">
+                                    ESTADO DO MONITORAMENTO
+                                </span>
+
+                                <strong id="gemeoEstado">
+                                    Aguardando leitura
+                                </strong>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="card fluxo-bioiot-card">
+                    <div class="fluxo-cabecalho">
+                        <div>
+                            <h3>Fluxo de dados do BioIoT</h3>
+                            <p>Acompanhe o caminho lógico das medições em tempo real.</p>
+                        </div>
+
+                        <span id="fluxoStatusGeral" class="fluxo-status">
+                            Aguardando conexão
+                        </span>
+                    </div>
+
+                    <div id="fluxoBioIoT" class="fluxo-bioiot">
+
+                        <div class="fluxo-etapa" id="fluxoESP32">
+                            <i data-lucide="cpu"></i>
+                            <strong>ESP32</strong>
+                            <small>Sensor MAX30102</small>
+                            <span class="fluxo-etapa-estado">Aguardando</span>
+                        </div>
+
+                        <div class="fluxo-conexao">
+                            <span></span>
+                        </div>
+
+                        <div class="fluxo-etapa" id="fluxoWifi">
+                            <i data-lucide="wifi"></i>
+                            <strong>Wi-Fi</strong>
+                            <small>Comunicação</small>
+                            <span class="fluxo-etapa-estado">Aguardando</span>
+                        </div>
+
+                        <div class="fluxo-conexao">
+                            <span></span>
+                        </div>
+
+                        <div class="fluxo-etapa" id="fluxoServidor">
+                            <i data-lucide="server"></i>
+                            <strong>Node.js</strong>
+                            <small>Servidor</small>
+                            <span class="fluxo-etapa-estado">Aguardando</span>
+                        </div>
+
+                        <div class="fluxo-conexao">
+                            <span></span>
+                        </div>
+
+                        <div class="fluxo-etapa" id="fluxoSQLite">
+                            <i data-lucide="database"></i>
+                            <strong>SQLite</strong>
+                            <small>Armazenamento</small>
+                            <span class="fluxo-etapa-estado">Aguardando</span>
+                        </div>
+
+                        <div class="fluxo-conexao">
+                            <span></span>
+                        </div>
+
+                        <div class="fluxo-etapa" id="fluxoDashboard">
+                            <i data-lucide="monitor"></i>
+                            <strong>Dashboard</strong>
+                            <small>Visualização</small>
+                            <span class="fluxo-etapa-estado">Aguardando</span>
+                        </div>
+
+                    </div>
+
+                    <div class="fluxo-rodape">
+                        <span id="fluxoDispositivo">
+                            Dispositivo: ESP32-BANCADA-01
+                        </span>
+
+                        <span id="fluxoModo">
+                            Modo: Livre
+                        </span>
+
+                        <span id="fluxoUltimaLeitura">
+                            Última leitura: --
+                        </span>
+                    </div>
+
+                    <p class="fluxo-observacao">
+                        Visualização lógica do sistema. As animações não representam
+                        a captura individual de pacotes de rede.
                     </p>
                 </div>
 
-                <div class="card gemeo-data-card">
-                    <h3>Dados em tempo real</h3>
+                <p style="margin-top:20px; opacity:0.7;">
+                    Representação visual experimental para fins acadêmicos.
+                    Não constitui simulação fisiológica ou ferramenta de diagnóstico.
+                </p>
 
-                    <div class="gemeo-metric-grid">
+            </section>
 
-                        <div class="gemeo-metric-box">
-                            <span class="gemeo-metric-label">
-                                BATIMENTOS CARDÍACOS
-                            </span>
+            <div id="dashboard" class="tab-content active">
+                <header>
+                    <h1>Monitoramento em Tempo Real</h1>
+                </header>
 
-                            <strong id="gemeoBpm" class="gemeo-bpm-valor">
-                                -- BPM
-                            </strong>
+                <div class="grid-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>BATIMENTOS CARDÍACOS</span>
+                            <i data-lucide="heart" style="color: var(--accent-red);"></i>
                         </div>
-
-                        <div class="gemeo-metric-box">
-                            <span class="gemeo-metric-label">
-                                OXIGENAÇÃO (SpO₂)
-                            </span>
-
-                            <strong id="gemeoSpo2" class="gemeo-spo2-valor">
-                                -- %
-                            </strong>
+                        <div class="value-display">
+                            <span class="number" id="bpmValue" style="color: var(--accent-red);">0</span>
+                            <span class="unit">BPM</span>
                         </div>
-
-                        <div class="gemeo-metric-box gemeo-metric-box-full">
-                            <span class="gemeo-metric-label">
-                                ESTADO DO MONITORAMENTO
-                            </span>
-
-                            <strong id="gemeoEstado">
-                                Aguardando leitura
-                            </strong>
+                        <div id="bpmStatus" class="status-badge">
+                            Sem medição
                         </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>OXIGENAÇÃO (SpO₂)</span>
+                            <i data-lucide="droplet" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="spo2Value" style="color: var(--accent-blue);">0</span>
+                            <span class="unit">%</span>
+                        </div>
+                        <div id="spo2Status" class="status-badge">
+                            Sem medição
+                        </div>
+                    </div>
 
+                    <div class="card">
+                        <div class="card-header">
+                            <span>CONDIÇÃO GERAL</span>
+                            <i data-lucide="shield-check" style="color: var(--accent-green);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="condicaoGeralTexto"
+                                style="font-size: 2.2rem; color: var(--accent-yellow);">AGUARDANDO...</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            Dispositivo ESP32: <strong id="activeDevice"
+                                style="color: var(--text-main);">ESP32-BANCADA-01</strong>
+                        </div>
                     </div>
                 </div>
 
-    </div>
-
-    <div class="card fluxo-bioiot-card">
-        <div class="fluxo-cabecalho">
-            <div>
-                <h3>Fluxo de dados do BioIoT</h3>
-                <p>Acompanhe o caminho lógico das medições em tempo real.</p>
-            </div>
-
-            <span id="fluxoStatusGeral" class="fluxo-status">
-                Aguardando conexão
-            </span>
-        </div>
-
-        <div id="fluxoBioIoT" class="fluxo-bioiot">
-
-            <div class="fluxo-etapa" id="fluxoESP32">
-                <i data-lucide="cpu"></i>
-                <strong>ESP32</strong>
-                <small>Sensor MAX30102</small>
-                <span class="fluxo-etapa-estado">Aguardando</span>
-            </div>
-
-            <div class="fluxo-conexao">
-                <span></span>
-            </div>
-
-            <div class="fluxo-etapa" id="fluxoWifi">
-                <i data-lucide="wifi"></i>
-                <strong>Wi-Fi</strong>
-                <small>Comunicação</small>
-                <span class="fluxo-etapa-estado">Aguardando</span>
-            </div>
-
-            <div class="fluxo-conexao">
-                <span></span>
-            </div>
-
-            <div class="fluxo-etapa" id="fluxoServidor">
-                <i data-lucide="server"></i>
-                <strong>Node.js</strong>
-                <small>Servidor</small>
-                <span class="fluxo-etapa-estado">Aguardando</span>
-            </div>
-
-            <div class="fluxo-conexao">
-                <span></span>
-            </div>
-
-            <div class="fluxo-etapa" id="fluxoSQLite">
-                <i data-lucide="database"></i>
-                <strong>SQLite</strong>
-                <small>Armazenamento</small>
-                <span class="fluxo-etapa-estado">Aguardando</span>
-            </div>
-
-            <div class="fluxo-conexao">
-                <span></span>
-            </div>
-
-            <div class="fluxo-etapa" id="fluxoDashboard">
-                <i data-lucide="monitor"></i>
-                <strong>Dashboard</strong>
-                <small>Visualização</small>
-                <span class="fluxo-etapa-estado">Aguardando</span>
-            </div>
-
-        </div>
-
-        <div class="fluxo-rodape">
-            <span id="fluxoDispositivo">
-                Dispositivo: ESP32-BANCADA-01
-            </span>
-
-            <span id="fluxoModo">
-                Modo: Livre
-            </span>
-
-            <span id="fluxoUltimaLeitura">
-                Última leitura: --
-            </span>
-        </div>
-
-        <p class="fluxo-observacao">
-            Visualização lógica do sistema. As animações não representam
-            a captura individual de pacotes de rede.
-        </p>
-    </div>
-
-    <p style="margin-top:20px; opacity:0.7;">
-        Representação visual experimental para fins acadêmicos.
-        Não constitui simulação fisiológica ou ferramenta de diagnóstico.
-    </p>
-
-    </section>
-
-    <div id="dashboard" class="tab-content active">
-        <header>
-            <h1>Monitoramento em Tempo Real</h1>
-        </header>
-
-        <div class="grid-cards">
-            <div class="card">
-                <div class="card-header">
-                    <span>BATIMENTOS CARDÍACOS</span>
-                    <i data-lucide="heart" style="color: var(--accent-red);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="bpmValue" style="color: var(--accent-red);">0</span>
-                    <span class="unit">BPM</span>
-                </div>
-                <div id="bpmStatus" class="status-badge">
-                    Sem medição
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <span>OXIGENAÇÃO (SpO₂)</span>
-                    <i data-lucide="droplet" style="color: var(--accent-blue);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="spo2Value" style="color: var(--accent-blue);">0</span>
-                    <span class="unit">%</span>
-                </div>
-                <div id="spo2Status" class="status-badge">
-                    Sem medição
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <span>HISTÓRICO DE MEDIÇÕES EM TEMPO REAL</span>
+                    </div>
+                    <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
+                        <canvas id="realtimeChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>CONDIÇÃO GERAL</span>
-                    <i data-lucide="shield-check" style="color: var(--accent-green);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="condicaoGeralTexto"
-                        style="font-size: 2.2rem; color: var(--accent-yellow);">AGUARDANDO...</span>
-                </div>
-                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
-                    Dispositivo ESP32: <strong id="activeDevice"
-                        style="color: var(--text-main);">ESP32-BANCADA-01</strong>
-                </div>
-            </div>
-        </div>
+            <div id="pacientes" class="tab-content">
+                <header>
+                    <h1>Gerenciamento de Visitantes / Pacientes</h1>
+                    <p style="color: var(--text-muted);">Cadastre pessoas e associe-os ao hardware ESP32 da bancada.</p>
+                </header>
 
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-header">
-                <span>HISTÓRICO DE MEDIÇÕES EM TEMPO REAL</span>
-            </div>
-            <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
-                <canvas id="realtimeChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div id="pacientes" class="tab-content">
-        <header>
-            <h1>Gerenciamento de Visitantes / Pacientes</h1>
-            <p style="color: var(--text-muted);">Cadastre pessoas e associe-os ao hardware ESP32 da bancada.</p>
-        </header>
-
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3 style="margin-bottom: 1rem; color: var(--accent-blue);">Cadastrar Novo Visitante</h3>
-            <form id="patientForm" onsubmit="cadastrarPaciente(event)"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px; gap: 1rem; align-items: end;">
-                <div>
-                    <label
-                        style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Nome:</label>
-                    <input type="text" id="pNome" required placeholder="Ex: Maria"
-                        style="width:100%; padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--accent-blue);">Cadastrar Novo Visitante</h3>
+                    <form id="patientForm" onsubmit="cadastrarPaciente(event)"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px; gap: 1rem; align-items: end;">
+                        <div>
+                            <label
+                                style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Nome:</label>
+                            <input type="text" id="pNome" required placeholder="Ex: Maria"
+                                style="width:100%; padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
+                        </div>
+                        <div>
+                            <label
+                                style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Idade:</label>
+                            <input type="number" id="pIdade" required placeholder="Ex: 30"
+                                style="width:100%; padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
+                        </div>
+                        <div>
+                            <label
+                                style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">ID
+                                do ESP32:</label>
+                            <input type="text" id="pDispositivo" required value="ESP32-BANCADA-01"
+                                style="width:100%; padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
+                        </div>
+                        <button type="submit"
+                            style="background: var(--accent-blue); color: #fff; border: none; padding: 0.6rem; border-radius: 6px; font-weight: bold; cursor: pointer;">Cadastrar</button>
+                    </form>
                 </div>
-                <div>
-                    <label
-                        style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Idade:</label>
-                    <input type="number" id="pIdade" required placeholder="Ex: 30"
-                        style="width:100%; padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
-                </div>
-                <div>
-                    <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">ID
-                        do ESP32:</label>
-                    <input type="text" id="pDispositivo" required value="ESP32-BANCADA-01"
-                        style="width:100%; padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
-                </div>
-                <button type="submit"
-                    style="background: var(--accent-blue); color: #fff; border: none; padding: 0.6rem; border-radius: 6px; font-weight: bold; cursor: pointer;">Cadastrar</button>
-            </form>
-        </div>
 
-        <div class="card" style="margin-top: 2rem;">
-            <h3 style="margin-bottom: 1rem;">Lista de Pessoas Cadastradas</h3>
-            <button type="button" onclick="encerrarMonitoramento()" style="background: var(--accent-red);
+                <div class="card" style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">Lista de Pessoas Cadastradas</h3>
+                    <button type="button" onclick="encerrarMonitoramento()" style="background: var(--accent-red);
                color: white;
                border: none;
                padding: 0.7rem 1rem;
                border-radius: 6px;
                cursor: pointer;
                margin-bottom: 1rem;">
-                Encerrar monitoramento
-            </button>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; color: var(--text-main);">
-                    <thead>
-                        <tr
-                            style="border-bottom: 1px solid var(--card-border); color: var(--text-muted); font-size: 0.85rem;">
-                            <th style="padding: 10px;">Nome</th>
-                            <th style="padding: 10px;">Idade</th>
-                            <th style="padding: 10px;">Dispositivo</th>
-                            <th style="padding: 10px; text-align: right;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="patientsTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                        Encerrar monitoramento
+                    </button>
+                    <div style="overflow-x: auto;">
+                        <table
+                            style="width: 100%; border-collapse: collapse; text-align: left; color: var(--text-main);">
+                            <thead>
+                                <tr
+                                    style="border-bottom: 1px solid var(--card-border); color: var(--text-muted); font-size: 0.85rem;">
+                                    <th style="padding: 10px;">Nome</th>
+                                    <th style="padding: 10px;">Idade</th>
+                                    <th style="padding: 10px;">Dispositivo</th>
+                                    <th style="padding: 10px; text-align: right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patientsTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-        <div class="card" id="historicoPacienteCard" style="margin-top: 2rem; display: none;">
+                <div class="card" id="historicoPacienteCard" style="margin-top: 2rem; display: none;">
 
-            <h3 style="margin-bottom: 0.5rem; color: var(--accent-blue);">
-                Histórico Individual
-            </h3>
+                    <h3 style="margin-bottom: 0.5rem; color: var(--accent-blue);">
+                        Histórico Individual
+                    </h3>
 
-            <p id="historicoPacienteNome" style="color: var(--text-muted); margin-bottom: 1.5rem;">
-            </p>
+                    <p id="historicoPacienteNome" style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                    </p>
 
-            <div style="display: flex; flex-wrap: wrap; gap: 1rem;
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem;
             align-items: end; margin-bottom: 1.5rem;">
 
-                <div>
-                    <label for="historicoDataInicio" style="display: block; color: var(--text-muted);
+                        <div>
+                            <label for="historicoDataInicio" style="display: block; color: var(--text-muted);
                       margin-bottom: 0.4rem;">
-                        Data inicial
-                    </label>
-                    <input type="date" id="historicoDataInicio" style="padding: 0.7rem; background: #0f172a;
+                                Data inicial
+                            </label>
+                            <input type="date" id="historicoDataInicio" style="padding: 0.7rem; background: #0f172a;
                       color: white; border: 1px solid var(--card-border);
                       border-radius: 6px;">
-                </div>
+                        </div>
 
-                <div>
-                    <label for="historicoDataFim" style="display: block; color: var(--text-muted);
+                        <div>
+                            <label for="historicoDataFim" style="display: block; color: var(--text-muted);
                       margin-bottom: 0.4rem;">
-                        Data final
-                    </label>
-                    <input type="date" id="historicoDataFim" style="padding: 0.7rem; background: #0f172a;
+                                Data final
+                            </label>
+                            <input type="date" id="historicoDataFim" style="padding: 0.7rem; background: #0f172a;
                       color: white; border: 1px solid var(--card-border);
                       border-radius: 6px;">
-                </div>
+                        </div>
 
-                <button type="button" onclick="filtrarHistoricoPaciente()" style="background: var(--accent-blue); color: #00111f;
+                        <button type="button" onclick="filtrarHistoricoPaciente()" style="background: var(--accent-blue); color: #00111f;
                    border: none; padding: 0.75rem 1rem;
                    border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Filtrar histórico
-                </button>
+                            Filtrar histórico
+                        </button>
 
-                <button type="button" onclick="limparFiltroHistorico()" style="background: #334155; color: white;
+                        <button type="button" onclick="limparFiltroHistorico()" style="background: #334155; color: white;
                    border: none; padding: 0.75rem 1rem;
                    border-radius: 6px; cursor: pointer;">
-                    Limpar filtro
-                </button>
-            </div>
+                            Limpar filtro
+                        </button>
+                    </div>
 
-            <div style="display: grid;
+                    <div style="display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
                 gap: 1rem; margin-bottom: 1.5rem;">
 
-                <div>
-                    <p style="color: var(--text-muted);">Total de medições</p>
-                    <h2 id="historicoTotal">--</h2>
-                </div>
+                        <div>
+                            <p style="color: var(--text-muted);">Total de medições</p>
+                            <h2 id="historicoTotal">--</h2>
+                        </div>
 
-                <div>
-                    <p style="color: var(--text-muted);">BPM médio</p>
-                    <h2 id="historicoMediaBpm">--</h2>
-                </div>
+                        <div>
+                            <p style="color: var(--text-muted);">BPM médio</p>
+                            <h2 id="historicoMediaBpm">--</h2>
+                        </div>
 
-                <div>
-                    <p style="color: var(--text-muted);">SpO₂ média</p>
-                    <h2 id="historicoMediaSpo2">--</h2>
-                </div>
-            </div>
+                        <div>
+                            <p style="color: var(--text-muted);">SpO₂ média</p>
+                            <h2 id="historicoMediaSpo2">--</h2>
+                        </div>
+                    </div>
 
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid var(--card-border);
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--card-border);
                            color: var(--text-muted);">
-                            <th style="padding: 10px;">Data e horário</th>
-                            <th style="padding: 10px;">BPM</th>
-                            <th style="padding: 10px;">SpO₂</th>
-                            <th style="padding: 10px;">Dispositivo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historicoPacienteTabela"></tbody>
-                </table>
+                                    <th style="padding: 10px;">Data e horário</th>
+                                    <th style="padding: 10px;">BPM</th>
+                                    <th style="padding: 10px;">SpO₂</th>
+                                    <th style="padding: 10px;">Dispositivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoPacienteTabela"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
 
-    <div id="alarmes" class="tab-content">
-        <header>
-            <h1>Central de Alarmes e Alertas</h1>
-            <p style="color: var(--text-muted);">
-                Monitoramento de alertas de BPM e SpO₂.
-            </p>
-        </header>
+            <div id="alarmes" class="tab-content">
+                <header>
+                    <h1>Central de Alarmes e Alertas</h1>
+                    <p style="color: var(--text-muted);">
+                        Monitoramento de alertas de BPM e SpO₂.
+                    </p>
+                </header>
 
-        <div class="card" style="margin-top: 1.5rem;">
-            <div style="display: flex; align-items: center;
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div style="display: flex; align-items: center;
                     gap: 1rem; flex-wrap: wrap;">
 
-                <i data-lucide="bell-ring" style="color: var(--accent-yellow);
+                        <i data-lucide="bell-ring" style="color: var(--accent-yellow);
                       width: 32px; height: 32px;"></i>
 
-                <div style="flex: 1;">
-                    <h3 id="alarmeTitulo">
-                        Aguardando monitoramento
-                    </h3>
+                        <div style="flex: 1;">
+                            <h3 id="alarmeTitulo">
+                                Aguardando monitoramento
+                            </h3>
 
-                    <p id="alarmeDescricao" style="color: var(--text-muted);
+                            <p id="alarmeDescricao" style="color: var(--text-muted);
                           font-size: 0.9rem;">
-                        Nenhum paciente em monitoramento.
-                    </p>
+                                Nenhum paciente em monitoramento.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="grid-cards" style="margin-top: 1.5rem;">
-            <div class="card">
-                <div class="card-header">
-                    <span>PACIENTE MONITORADO</span>
+                <div class="grid-cards" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>PACIENTE MONITORADO</span>
+                        </div>
+                        <h2 id="alarmePaciente">Nenhum</h2>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>BATIMENTOS (BPM)</span>
+                        </div>
+                        <h2 id="alarmeBpm">--</h2>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>OXIGENAÇÃO (SpO₂)</span>
+                        </div>
+                        <h2 id="alarmeSpo2">--</h2>
+                    </div>
                 </div>
-                <h2 id="alarmePaciente">Nenhum</h2>
-            </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>BATIMENTOS (BPM)</span>
-                </div>
-                <h2 id="alarmeBpm">--</h2>
-            </div>
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>Controle de alerta sonoro</h3>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>OXIGENAÇÃO (SpO₂)</span>
-                </div>
-                <h2 id="alarmeSpo2">--</h2>
-            </div>
-        </div>
-
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3>Controle de alerta sonoro</h3>
-
-            <p style="color: var(--text-muted);
+                    <p style="color: var(--text-muted);
                   margin: 0.8rem 0;">
-                O som será utilizado apenas para alertas
-                confirmados durante o monitoramento.
-            </p>
+                        O som será utilizado apenas para alertas
+                        confirmados durante o monitoramento.
+                    </p>
 
-            <div style="display: flex; flex-wrap: wrap;
+                    <div style="display: flex; flex-wrap: wrap;
                     gap: 1rem; margin-top: 1rem;">
 
-                <button type="button" id="ativarSomAlarme" disabled>
-                    Ativar som
-                </button>
+                        <button type="button" id="ativarSomAlarme" disabled>
+                            Ativar som
+                        </button>
 
-                <button type="button" id="silenciarSomAlarme" disabled>
-                    Silenciar alarme
-                </button>
-            </div>
+                        <button type="button" id="silenciarSomAlarme" disabled>
+                            Silenciar alarme
+                        </button>
+                    </div>
 
-            <p id="alarmeSomStatus" style="color: var(--text-muted);
+                    <p id="alarmeSomStatus" style="color: var(--text-muted);
                   margin-top: 1rem;">
-                Controle sonoro em preparação.
-            </p>
-        </div>
+                        Controle sonoro em preparação.
+                    </p>
+                </div>
 
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3>Histórico de alertas</h3>
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>Histórico de alertas</h3>
 
-            <p id="alarmeHistoricoStatus" style="color: var(--text-muted);
+                    <p id="alarmeHistoricoStatus" style="color: var(--text-muted);
                   margin-top: 1rem;">
-                Nenhum alerta carregado.
-            </p>
+                        Nenhum alerta carregado.
+                    </p>
 
-            <div id="alarmeHistoricoLista" style="margin-top: 1rem;">
-            </div>
-        </div>
+                    <div id="alarmeHistoricoLista" style="margin-top: 1rem;">
+                    </div>
+                </div>
 
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                         cursor: pointer;
                         font-weight: bold;">
-                Laboratório de Simulação de Alarmes
-            </summary>
+                        Laboratório de Simulação de Alarmes
+                    </summary>
 
-            <p style="color: var(--text-muted);
+                    <p style="color: var(--text-muted);
                   margin-top: 1rem;">
-                Simulação acadêmica com valores fictícios.
-                Não altera as medições reais dos pacientes.
-            </p>
+                        Simulação acadêmica com valores fictícios.
+                        Não altera as medições reais dos pacientes.
+                    </p>
 
 
-            <div id="laboratorioAlarmes" style="margin-top: 1rem;">
+                    <div id="laboratorioAlarmes" style="margin-top: 1rem;">
 
-                <div style="display: flex; flex-wrap: wrap;
+                        <div style="display: flex; flex-wrap: wrap;
                 gap: 1rem; align-items: end;">
 
-                    <div>
-                        <label for="simulacaoBpm">BPM simulado</label>
-                        <input type="number" id="simulacaoBpm" value="80" min="40" max="160" style="display:block; padding:0.7rem;
+                            <div>
+                                <label for="simulacaoBpm">BPM simulado</label>
+                                <input type="number" id="simulacaoBpm" value="80" min="40" max="160" style="display:block; padding:0.7rem;
                           background:#0f172a; color:white;
                           border:1px solid var(--card-border);
                           border-radius:6px; width:140px;">
-                    </div>
+                            </div>
 
-                    <div>
-                        <label for="simulacaoSpo2">SpO₂ simulada (%)</label>
-                        <input type="number" id="simulacaoSpo2" value="99" min="75" max="100" style="display:block; padding:0.7rem;
+                            <div>
+                                <label for="simulacaoSpo2">SpO₂ simulada (%)</label>
+                                <input type="number" id="simulacaoSpo2" value="99" min="75" max="100" style="display:block; padding:0.7rem;
                           background:#0f172a; color:white;
                           border:1px solid var(--card-border);
                           border-radius:6px; width:140px;">
-                    </div>
+                            </div>
 
-                    <button type="button" onclick="simularAlarme()" style="padding:0.75rem 1rem;
+                            <button type="button" onclick="simularAlarme()" style="padding:0.75rem 1rem;
                        background:var(--accent-blue);
                        color:#00111f; border:0;
                        border-radius:6px; cursor:pointer;">
-                        Simular alarme
-                    </button>
+                                Simular alarme
+                            </button>
 
-                    <button type="button" onclick="encerrarSimulacaoAlarme()" style="padding:0.75rem 1rem;
+                            <button type="button" onclick="encerrarSimulacaoAlarme()" style="padding:0.75rem 1rem;
                        background:#334155; color:white;
                        border:0; border-radius:6px;
                        cursor:pointer;">
-                        Encerrar simulação
-                    </button>
-                    <button type="button" onclick="testarSomAlarmeSimulado()" style="padding:0.75rem 1rem;
+                                Encerrar simulação
+                            </button>
+                            <button type="button" onclick="testarSomAlarmeSimulado()" style="padding:0.75rem 1rem;
                background:var(--accent-yellow);
                color:#0f172a;
                border:0;
                border-radius:6px;
                cursor:pointer;">
-                        Testar som
-                    </button>
-                </div>
+                                Testar som
+                            </button>
+                        </div>
 
-                <p id="resultadoSimulacaoAlarme" style="margin-top:1rem; color:var(--text-muted);">
-                    Informe os valores e execute a simulação.
-                </p>
+                        <p id="resultadoSimulacaoAlarme" style="margin-top:1rem; color:var(--text-muted);">
+                            Informe os valores e execute a simulação.
+                        </p>
+                    </div>
+
+                </details>
             </div>
 
-        </details>
-    </div>
+            <div id="custos" class="tab-content">
+                <header>
+                    <h1>Custo, Tempo de Execução & Consumo de CPU</h1>
+                </header>
 
-    <div id="custos" class="tab-content">
-        <header>
-            <h1>Custo, Tempo de Execução & Consumo de CPU</h1>
-        </header>
+                <div class="grid-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>TEMPO DE ATIVIDADE (UPTIME)</span>
+                            <i data-lucide="clock" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="uptimeValue" style="color: var(--accent-blue);">00:00:00</span>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">Sessão ativa do sistema</div>
+                    </div>
 
-        <div class="grid-cards">
-            <div class="card">
-                <div class="card-header">
-                    <span>TEMPO DE ATIVIDADE (UPTIME)</span>
-                    <i data-lucide="clock" style="color: var(--accent-blue);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="uptimeValue" style="color: var(--accent-blue);">00:00:00</span>
-                </div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">Sessão ativa do sistema</div>
-            </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>CPU REAL DO SERVIDOR NODE.JS</span>
+                            <i data-lucide="cpu" style="color: var(--accent-yellow);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="cpuUsage" style="color: var(--accent-yellow);">14.2</span>
+                            <span class="unit">%</span>
+                        </div>
+                        <div class="status-badge status-normal">
+                            <i data-lucide="zap" style="width: 14px;"></i> Processo Node.js | 1 núcleo = 100%
+                        </div>
+                    </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>CPU REAL DO SERVIDOR NODE.JS</span>
-                    <i data-lucide="cpu" style="color: var(--accent-yellow);"></i>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>CUSTO ESTIMADO DO PERÍODO</span>
+                            <i data-lucide="dollar-sign" style="color: var(--accent-green);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="energyCost"
+                                style="font-size: 2.2rem; color: var(--accent-green);">--</span>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">
+                            Projeção calculada no laboratório abaixo
+                        </div>
+                    </div>
                 </div>
-                <div class="value-display">
-                    <span class="number" id="cpuUsage" style="color: var(--accent-yellow);">14.2</span>
-                    <span class="unit">%</span>
-                </div>
-                <div class="status-badge status-normal">
-                    <i data-lucide="zap" style="width: 14px;"></i> Processo Node.js | 1 núcleo = 100%
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <span>CUSTO ESTIMADO DO PERÍODO</span>
-                    <i data-lucide="dollar-sign" style="color: var(--accent-green);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="energyCost"
-                        style="font-size: 2.2rem; color: var(--accent-green);">--</span>
-                </div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">
-                    Projeção calculada no laboratório abaixo
-                </div>
-            </div>
-        </div>
 
 
-        <div class="grid-cards" style="margin-top: 1.5rem;">
-            <div class="card">
-                <div class="card-header">
-                    <span>MEMÓRIA REAL DO NODE.JS (RSS)</span>
-                    <i data-lucide="memory-stick" style="color: var(--accent-blue);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="memoryRSS" style="color: var(--accent-blue);">--</span>
-                    <span class="unit">MB</span>
-                </div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">
-                    Memória residente do processo no Docker
-                </div>
-            </div>
+                <div class="grid-cards" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>MEMÓRIA REAL DO NODE.JS (RSS)</span>
+                            <i data-lucide="memory-stick" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="memoryRSS" style="color: var(--accent-blue);">--</span>
+                            <span class="unit">MB</span>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">
+                            Memória residente do processo no Docker
+                        </div>
+                    </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>HEAP JAVASCRIPT UTILIZADO</span>
-                    <i data-lucide="layers" style="color: var(--accent-yellow);"></i>
-                </div>
-                <div class="value-display">
-                    <span class="number" id="memoryHeap" style="color: var(--accent-yellow);">--</span>
-                    <span class="unit">MB</span>
-                </div>
-                <div style="font-size:0.85rem; color:var(--text-muted);">
-                    Memória utilizada pelos objetos JavaScript
-                </div>
-            </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>HEAP JAVASCRIPT UTILIZADO</span>
+                            <i data-lucide="layers" style="color: var(--accent-yellow);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="memoryHeap" style="color: var(--accent-yellow);">--</span>
+                            <span class="unit">MB</span>
+                        </div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">
+                            Memória utilizada pelos objetos JavaScript
+                        </div>
+                    </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>CONEXÃO COM O ESP32</span>
-                    <i data-lucide="wifi" style="color: var(--accent-green);"></i>
+                    <div class="card">
+                        <div class="card-header">
+                            <span>CONEXÃO COM O ESP32</span>
+                            <i data-lucide="wifi" style="color: var(--accent-green);"></i>
+                        </div>
+                        <div class="value-display">
+                            <span class="number" id="espStatusPerformance"
+                                style="font-size:2rem; color:var(--accent-green);">--</span>
+                        </div>
+                        <div id="espLastContact" style="font-size:0.85rem; color:var(--text-muted);">
+                            Aguardando comunicação
+                        </div>
+                    </div>
                 </div>
-                <div class="value-display">
-                    <span class="number" id="espStatusPerformance"
-                        style="font-size:2rem; color:var(--accent-green);">--</span>
+
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <span>Histórico de Utilização Real da CPU — Servidor Node.js</span>
+                        <i data-lucide="activity" style="color: var(--accent-yellow);"></i>
+                    </div>
+                    <div class="chart-container" style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
                 </div>
-                <div id="espLastContact" style="font-size:0.85rem; color:var(--text-muted);">
-                    Aguardando comunicação
+                <div class="card" style="margin-top: 1.5rem;">
+                    <div class="card-header">
+                        <span>Histórico de Memória Real — Servidor Node.js</span>
+                        <i data-lucide="memory-stick" style="color: var(--accent-blue);"></i>
+                    </div>
+
+                    <div class="chart-container" style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="memoryChart"></canvas>
+                    </div>
+
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
+                        RSS: memória residente do processo.
+                        Heap: memória utilizada pelos objetos JavaScript.
+                        Leituras reais coletadas a cada 3 segundos.
+                    </p>
                 </div>
-            </div>
-        </div>
 
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-header">
-                <span>Histórico de Utilização Real da CPU — Servidor Node.js</span>
-                <i data-lucide="activity" style="color: var(--accent-yellow);"></i>
-            </div>
-            <div class="chart-container" style="position: relative; height: 280px; width: 100%;">
-                <canvas id="performanceChart"></canvas>
-            </div>
-        </div>
-        <div class="card" style="margin-top: 1.5rem;">
-            <div class="card-header">
-                <span>Histórico de Memória Real — Servidor Node.js</span>
-                <i data-lucide="memory-stick" style="color: var(--accent-blue);"></i>
-            </div>
-
-            <div class="chart-container" style="position: relative; height: 280px; width: 100%;">
-                <canvas id="memoryChart"></canvas>
-            </div>
-
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem;">
-                RSS: memória residente do processo.
-                Heap: memória utilizada pelos objetos JavaScript.
-                Leituras reais coletadas a cada 3 segundos.
-            </p>
-        </div>
-
-        <!-- LABORATÓRIO DE ESTIMATIVA ENERGÉTICA -->
-        <!-- LABORATÓRIO DE ESTIMATIVA ENERGÉTICA -->
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue); font-size: 1.15rem;
+                <!-- LABORATÓRIO DE ESTIMATIVA ENERGÉTICA -->
+                <!-- LABORATÓRIO DE ESTIMATIVA ENERGÉTICA -->
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue); font-size: 1.15rem;
                     font-weight: bold; cursor: pointer; padding: 0.5rem 0;">
-                Laboratório de Consumo Energético — ESP32
-            </summary>
+                        Laboratório de Consumo Energético — ESP32
+                    </summary>
 
-            <p style="color: var(--text-muted); margin: 1rem 0;">
-                Simule o custo de funcionamento do ESP32 a partir da tensão,
-                corrente elétrica, tempo de utilização e tarifa de energia.
-                Os resultados são estimativas, não medições elétricas reais.
-            </p>
+                    <p style="color: var(--text-muted); margin: 1rem 0;">
+                        Simule o custo de funcionamento do ESP32 a partir da tensão,
+                        corrente elétrica, tempo de utilização e tarifa de energia.
+                        Os resultados são estimativas, não medições elétricas reais.
+                    </p>
 
-            <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: end;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: end;">
 
-                <div>
-                    <label for="energiaTensao">Tensão (V)</label>
-                    <input type="number" id="energiaTensao" value="5" min="0.1" step="0.1" style="display:block; padding:0.7rem; width:140px;
+                        <div>
+                            <label for="energiaTensao">Tensão (V)</label>
+                            <input type="number" id="energiaTensao" value="5" min="0.1" step="0.1" style="display:block; padding:0.7rem; width:140px;
                           background:#0f172a; color:white;
                           border:1px solid var(--card-border); border-radius:6px;">
-                </div>
+                        </div>
 
-                <div>
-                    <label for="energiaCorrente">Corrente estimada (mA)</label>
-                    <input type="number" id="energiaCorrente" value="160" min="0.1" step="1" style="display:block; padding:0.7rem; width:160px;
+                        <div>
+                            <label for="energiaCorrente">Corrente estimada (mA)</label>
+                            <input type="number" id="energiaCorrente" value="160" min="0.1" step="1" style="display:block; padding:0.7rem; width:160px;
                           background:#0f172a; color:white;
                           border:1px solid var(--card-border); border-radius:6px;">
-                </div>
+                        </div>
 
-                <div>
-                    <label for="energiaHoras">Horas de funcionamento</label>
-                    <input type="number" id="energiaHoras" value="24" min="0.1" step="0.5" style="display:block; padding:0.7rem; width:170px;
+                        <div>
+                            <label for="energiaHoras">Horas de funcionamento</label>
+                            <input type="number" id="energiaHoras" value="24" min="0.1" step="0.5" style="display:block; padding:0.7rem; width:170px;
                           background:#0f172a; color:white;
                           border:1px solid var(--card-border); border-radius:6px;">
-                </div>
+                        </div>
 
-                <div>
-                    <label for="energiaTarifa">Tarifa (R$/kWh)</label>
-                    <input type="number" id="energiaTarifa" placeholder="Informe a tarifa" min="0" step="0.01" style="display:block; padding:0.7rem; width:170px;
+                        <div>
+                            <label for="energiaTarifa">Tarifa (R$/kWh)</label>
+                            <input type="number" id="energiaTarifa" placeholder="Informe a tarifa" min="0" step="0.01"
+                                style="display:block; padding:0.7rem; width:170px;
                           background:#0f172a; color:white;
                           border:1px solid var(--card-border); border-radius:6px;">
-                </div>
+                        </div>
 
-                <button type="button" onclick="calcularConsumoEnergetico()" style="background:var(--accent-blue); color:#00111f;
+                        <button type="button" onclick="calcularConsumoEnergetico()" style="background:var(--accent-blue); color:#00111f;
                        padding:0.75rem 1.2rem; border:none;
                        border-radius:6px; font-weight:bold; cursor:pointer;">
-                    Calcular estimativa
-                </button>
-            </div>
+                            Calcular estimativa
+                        </button>
+                    </div>
 
-            <div id="resultadoConsumoEnergetico" aria-live="polite" style="margin-top:1.5rem; color:var(--text-muted);">
-                Preencha a tarifa para calcular o consumo energético estimado.
-            </div>
-        </details>
+                    <div id="resultadoConsumoEnergetico" aria-live="polite"
+                        style="margin-top:1.5rem; color:var(--text-muted);">
+                        Preencha a tarifa para calcular o consumo energético estimado.
+                    </div>
+                </details>
 
-        <!-- LABORATÓRIO DE ESTATÍSTICAS REAIS -->
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <!-- LABORATÓRIO DE ESTATÍSTICAS REAIS -->
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Análise Estatística do Desempenho Real
-            </summary>
+                        Análise Estatística do Desempenho Real
+                    </summary>
 
-            <p style="color: var(--text-muted); margin: 1rem 0;">
-                Calcule médias e picos reais de CPU e memória do servidor
-                BioIoT com as medições coletadas durante esta sessão.
-            </p>
+                    <p style="color: var(--text-muted); margin: 1rem 0;">
+                        Calcule médias e picos reais de CPU e memória do servidor
+                        BioIoT com as medições coletadas durante esta sessão.
+                    </p>
 
-            <button type="button" onclick="analisarEstatisticasDesempenho()" style="background: var(--accent-blue);
+                    <button type="button" onclick="analisarEstatisticasDesempenho()" style="background: var(--accent-blue);
                    color: #00111f;
                    padding: 0.75rem 1.2rem;
                    border: none;
                    border-radius: 6px;
                    font-weight: bold;
                    cursor: pointer;">
-                Analisar desempenho real
-            </button>
+                        Analisar desempenho real
+                    </button>
 
-            <div id="resultadoEstatisticasDesempenho" aria-live="polite"
-                style="margin-top: 1.5rem; color: var(--text-muted);">
-                Clique no botão para analisar as medições reais coletadas.
-            </div>
-        </details>
+                    <div id="resultadoEstatisticasDesempenho" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Clique no botão para analisar as medições reais coletadas.
+                    </div>
+                </details>
 
-        <!-- LABORATÓRIO DE COMUNICAÇÃO REAL DO ESP32 -->
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <!-- LABORATÓRIO DE COMUNICAÇÃO REAL DO ESP32 -->
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Análise de Comunicação Real — ESP32
-            </summary>
+                        Análise de Comunicação Real — ESP32
+                    </summary>
 
-            <p style="color: var(--text-muted); margin: 1rem 0;">
-                Analise os heartbeats e as requisições realmente recebidas
-                pelo servidor BioIoT durante sua execução.
-            </p>
+                    <p style="color: var(--text-muted); margin: 1rem 0;">
+                        Analise os heartbeats e as requisições realmente recebidas
+                        pelo servidor BioIoT durante sua execução.
+                    </p>
 
-            <button type="button" onclick="analisarComunicacaoESP32()" style="background: var(--accent-blue);
+                    <button type="button" onclick="analisarComunicacaoESP32()" style="background: var(--accent-blue);
                    color: #00111f;
                    padding: 0.75rem 1.2rem;
                    border: none;
                    border-radius: 6px;
                    font-weight: bold;
                    cursor: pointer;">
-                Analisar comunicação real
-            </button>
+                        Analisar comunicação real
+                    </button>
 
-            <div id="resultadoComunicacaoESP32" aria-live="polite"
-                style="margin-top: 1.5rem; color: var(--text-muted);">
-                Clique no botão para consultar a comunicação do ESP32.
+                    <div id="resultadoComunicacaoESP32" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Clique no botão para consultar a comunicação do ESP32.
+                    </div>
+                </details>
+
             </div>
-        </details>
 
-    </div>
+            <div id="relatorios" class="tab-content">
+                <header>
+                    <h1>Relatórios Biométricos e Operacionais</h1>
+                    <p style="color: var(--text-muted);">Gere relatórios individuais por paciente ou o relatório geral
+                        para a staff da feira.</p>
+                </header>
 
-    <div id="relatorios" class="tab-content">
-        <header>
-            <h1>Relatórios Biométricos e Operacionais</h1>
-            <p style="color: var(--text-muted);">Gere relatórios individuais por paciente ou o relatório geral
-                para a staff da feira.</p>
-        </header>
+                <div class="card"
+                    style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div>
+                            <label
+                                style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:0.3rem;">Tipo
+                                de Relatório:</label>
+                            <select id="tipoRelatorio" onchange="mudarTipoRelatorio()"
+                                style="padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
+                                <option value="individual">Relatório Individual (Paciente Ativo)</option>
+                                <option value="geral">Relatório Geral (Painel da Staff)</option>
+                            </select>
 
-        <div class="card"
-            style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <div>
-                    <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom:0.3rem;">Tipo
-                        de Relatório:</label>
-                    <select id="tipoRelatorio" onchange="mudarTipoRelatorio()"
-                        style="padding: 0.6rem; background:#0f172a; border:1px solid var(--card-border); color:#fff; border-radius:6px;">
-                        <option value="individual">Relatório Individual (Paciente Ativo)</option>
-                        <option value="geral">Relatório Geral (Painel da Staff)</option>
-                    </select>
-
-                    <div id="campoPacienteRelatorio" style="margin-top: 1rem;">
-                        <label for="pacienteRelatorio" style="display: block; font-size: 0.8rem;
+                            <div id="campoPacienteRelatorio" style="margin-top: 1rem;">
+                                <label for="pacienteRelatorio" style="display: block; font-size: 0.8rem;
                   color: var(--text-muted); margin-bottom: 0.3rem;">
-                            Paciente
-                        </label>
+                                    Paciente
+                                </label>
 
-                        <select id="pacienteRelatorio" onchange="carregarTabelaRelatorios()" style="padding: 0.6rem;
+                                <select id="pacienteRelatorio" onchange="carregarTabelaRelatorios()" style="padding: 0.6rem;
                    background: #0f172a;
                    border: 1px solid var(--card-border);
                    color: #fff;
                    border-radius: 6px;">
-                            <option value="">Selecione um paciente</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
-                        <div>
-                            <label for="relatorioDataInicio">Data inicial</label>
-                            <input type="date" id="relatorioDataInicio" style="display:block; padding:0.6rem; background:#0f172a;
+                                    <option value="">Selecione um paciente</option>
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                                <div>
+                                    <label for="relatorioDataInicio">Data inicial</label>
+                                    <input type="date" id="relatorioDataInicio" style="display:block; padding:0.6rem; background:#0f172a;
                       color:white; border:1px solid var(--card-border);
                       border-radius:6px;">
-                        </div>
+                                </div>
 
-                        <div>
-                            <label for="relatorioDataFim">Data final</label>
-                            <input type="date" id="relatorioDataFim" style="display:block; padding:0.6rem; background:#0f172a;
+                                <div>
+                                    <label for="relatorioDataFim">Data final</label>
+                                    <input type="date" id="relatorioDataFim" style="display:block; padding:0.6rem; background:#0f172a;
                       color:white; border:1px solid var(--card-border);
                       border-radius:6px;">
-                        </div>
+                                </div>
 
-                        <button type="button" onclick="carregarTabelaRelatorios()" style="align-self:end; padding:0.7rem 1rem;
+                                <button type="button" onclick="carregarTabelaRelatorios()" style="align-self:end; padding:0.7rem 1rem;
                    background:var(--accent-blue); color:#00111f;
                    border:0; border-radius:6px; cursor:pointer;">
-                            Filtrar relatório
+                                    Filtrar relatório
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="exportarRelatorioCSV()"
+                            style="background: var(--accent-green); color: #000; border: none; padding: 0.7rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center;">
+                            <i data-lucide="file-spreadsheet" style="width: 18px; margin-right: 5px;"></i> Exportar CSV
+                            Ativo
                         </button>
                     </div>
                 </div>
-            </div>
-            <div>
-                <button onclick="exportarRelatorioCSV()"
-                    style="background: var(--accent-green); color: #000; border: none; padding: 0.7rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center;">
-                    <i data-lucide="file-spreadsheet" style="width: 18px; margin-right: 5px;"></i> Exportar CSV
-                    Ativo
-                </button>
-            </div>
-        </div>
 
-        <div class="card" style="margin-top: 2rem;">
-            <div class="card-header">
-                <span id="tituloTabelaRelatorio">Histórico Individual - Paciente Ativo</span>
-                <i data-lucide="database" style="color: var(--accent-blue);"></i>
-            </div>
-            <div style="overflow-x: auto; margin-top: 1rem;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left; color: var(--text-main);">
-                    <thead>
-                        <tr
-                            style="border-bottom: 1px solid var(--card-border); color: var(--text-muted); font-size: 0.85rem;">
-                            <th style="padding: 10px;">ID</th>
-                            <th style="padding: 10px;">Dispositivo</th>
-                            <th style="padding: 10px;">BPM</th>
-                            <th style="padding: 10px;">SpO₂ (%)</th>
-                            <th style="padding: 10px;">Data / Hora</th>
-                        </tr>
-                    </thead>
-                    <tbody id="relatoriosTableBody">
-                        <tr>
-                            <td colspan="5" style="padding: 15px; text-align: center; color: var(--text-muted);">A
-                                carregar
-                                dados...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div id="algoritmos" class="tab-content">
-        <header>
-            <h1>Análise de Algoritmos</h1>
-            <p style="color: var(--text-muted);">
-                Aplicação dos conteúdos da disciplina de Análise de Algoritmos
-                ao projeto BioIoT.
-            </p>
-        </header>
-
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
-                Objetivo do módulo
-            </h3>
-            <p>
-                Esta seção apresenta experimentos de busca, ordenação,
-                complexidade computacional, recursividade, intratabilidade
-                e precisão numérica.
-            </p>
-            <p style="margin-top: 0.8rem; color: var(--text-muted);">
-                O módulo utiliza medições reais registradas pelo ESP32
-                para demonstrar algoritmos de busca, ordenação e análise
-                estatística. Também apresenta experimentos acadêmicos
-                com dados simulados para estudar complexidade temporal,
-                espacial, recursividade, intratabilidade e precisão
-                numérica. As análises não modificam o histórico
-                armazenado no banco de dados.
-            </p>
-        </div>
-
-        <div class="grid-cards" style="margin-top: 1.5rem;">
-            <div class="card">
-                <div class="card-header">
-                    <span>COMPLEXIDADE TEMPORAL</span>
-                    <i data-lucide="timer" style="color: var(--accent-blue);"></i>
+                <div class="card" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <span id="tituloTabelaRelatorio">Histórico Individual - Paciente Ativo</span>
+                        <i data-lucide="database" style="color: var(--accent-blue);"></i>
+                    </div>
+                    <div style="overflow-x: auto; margin-top: 1rem;">
+                        <table
+                            style="width: 100%; border-collapse: collapse; text-align: left; color: var(--text-main);">
+                            <thead>
+                                <tr
+                                    style="border-bottom: 1px solid var(--card-border); color: var(--text-muted); font-size: 0.85rem;">
+                                    <th style="padding: 10px;">ID</th>
+                                    <th style="padding: 10px;">Dispositivo</th>
+                                    <th style="padding: 10px;">BPM</th>
+                                    <th style="padding: 10px;">SpO₂ (%)</th>
+                                    <th style="padding: 10px;">Data / Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody id="relatoriosTableBody">
+                                <tr>
+                                    <td colspan="5"
+                                        style="padding: 15px; text-align: center; color: var(--text-muted);">A
+                                        carregar
+                                        dados...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <h2>O(n²) × O(n log n)</h2>
-                <p style="color: var(--text-muted); margin-top: 1rem;">
-                    Comparação entre Selection Sort e Merge Sort
-                    com diferentes quantidades de dados.
-                </p>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>RECURSIVIDADE</span>
-                    <i data-lucide="git-branch" style="color: var(--accent-blue);"></i>
+            <div id="algoritmos" class="tab-content">
+                <header>
+                    <h1>Análise de Algoritmos</h1>
+                    <p style="color: var(--text-muted);">
+                        Aplicação dos conteúdos da disciplina de Análise de Algoritmos
+                        ao projeto BioIoT.
+                    </p>
+                </header>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
+                        Objetivo do módulo
+                    </h3>
+                    <p>
+                        Esta seção apresenta experimentos de busca, ordenação,
+                        complexidade computacional, recursividade, intratabilidade
+                        e precisão numérica.
+                    </p>
+                    <p style="margin-top: 0.8rem; color: var(--text-muted);">
+                        O módulo utiliza medições reais registradas pelo ESP32
+                        para demonstrar algoritmos de busca, ordenação e análise
+                        estatística. Também apresenta experimentos acadêmicos
+                        com dados simulados para estudar complexidade temporal,
+                        espacial, recursividade, intratabilidade e precisão
+                        numérica. As análises não modificam o histórico
+                        armazenado no banco de dados.
+                    </p>
                 </div>
-                <h2>Teorema Mestre</h2>
-                <p style="color: var(--text-muted); margin-top: 1rem;">
-                    Análise das chamadas recursivas, profundidade
-                    e recorrência do Merge Sort.
-                </p>
-            </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <span>COMPLEXIDADE ESPACIAL</span>
-                    <i data-lucide="memory-stick" style="color: var(--accent-blue);"></i>
+                <div class="grid-cards" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>COMPLEXIDADE TEMPORAL</span>
+                            <i data-lucide="timer" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <h2>O(n²) × O(n log n)</h2>
+                        <p style="color: var(--text-muted); margin-top: 1rem;">
+                            Comparação entre Selection Sort e Merge Sort
+                            com diferentes quantidades de dados.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>RECURSIVIDADE</span>
+                            <i data-lucide="git-branch" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <h2>Teorema Mestre</h2>
+                        <p style="color: var(--text-muted); margin-top: 1rem;">
+                            Análise das chamadas recursivas, profundidade
+                            e recorrência do Merge Sort.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>COMPLEXIDADE ESPACIAL</span>
+                            <i data-lucide="memory-stick" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <h2>O(1) × O(n)</h2>
+                        <p style="color: var(--text-muted); margin-top: 1rem;">
+                            Comparação de memória auxiliar utilizada
+                            por diferentes implementações de ordenação.
+                        </p>
+                    </div>
                 </div>
-                <h2>O(1) × O(n)</h2>
-                <p style="color: var(--text-muted); margin-top: 1rem;">
-                    Comparação de memória auxiliar utilizada
-                    por diferentes implementações de ordenação.
-                </p>
-            </div>
-        </div>
 
-        <!-- ANALISE DE DADOS REAIS DO ESP32 -->
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
-                Análise do Histórico Real do ESP32
-            </h3>
+                <!-- ANALISE DE DADOS REAIS DO ESP32 -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
+                        Análise do Histórico Real do ESP32
+                    </h3>
 
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Utilize medições registradas no SQLite para executar
-                o Merge Sort e ordenar os batimentos cardíacos.
-            </p>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Utilize medições registradas no SQLite para executar
+                        o Merge Sort e ordenar os batimentos cardíacos.
+                    </p>
 
-            <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
-                <div>
-                    <label for="quantidadeHistorico" style="display: block; margin-bottom: 0.5rem;">
-                        Últimas medições registradas
-                    </label>
+                    <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                        <div>
+                            <label for="quantidadeHistorico" style="display: block; margin-bottom: 0.5rem;">
+                                Últimas medições registradas
+                            </label>
 
-                    <select id="quantidadeHistorico" style="padding: 0.7rem; background: #0f172a;
+                            <select id="quantidadeHistorico" style="padding: 0.7rem; background: #0f172a;
                     color: white; border: 1px solid var(--card-border);
                     border-radius: 6px;">
-                        <option value="10">10 medições</option>
-                        <option value="50">50 medições</option>
-                        <option value="100">100 medições</option>
-                        <option value="500">500 medições</option>
-                    </select>
-                </div>
+                                <option value="10">10 medições</option>
+                                <option value="50">50 medições</option>
+                                <option value="100">100 medições</option>
+                                <option value="500">500 medições</option>
+                            </select>
+                        </div>
 
 
-                <div>
-                    <label for="bpmBuscaHistorico" style="display: block; margin-bottom: 0.5rem;">
-                        Pesquisar BPM
-                    </label>
+                        <div>
+                            <label for="bpmBuscaHistorico" style="display: block; margin-bottom: 0.5rem;">
+                                Pesquisar BPM
+                            </label>
 
-                    <input type="number" id="bpmBuscaHistorico" min="1" max="300" step="1" placeholder="Ex.: 69" style="padding: 0.7rem; width: 140px;
+                            <input type="number" id="bpmBuscaHistorico" min="1" max="300" step="1" placeholder="Ex.: 69"
+                                style="padding: 0.7rem; width: 140px;
                   background: #0f172a; color: white;
                   border: 1px solid var(--card-border);
                   border-radius: 6px;">
-                </div>
+                        </div>
 
-                <button type="button" onclick="analisarHistoricoReal()" style="background: var(--accent-blue); color: #00111f;
+                        <button type="button" onclick="analisarHistoricoReal()" style="background: var(--accent-blue); color: #00111f;
                 padding: 0.75rem 1.2rem; border: none;
                 border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Analisar dados reais
-                </button>
-            </div>
+                            Analisar dados reais
+                        </button>
+                    </div>
 
-            <div id="resultadoHistoricoReal" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
-                Escolha uma quantidade e consulte os registros do ESP32.
-            </div>
-        </div>
+                    <div id="resultadoHistoricoReal" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Escolha uma quantidade e consulte os registros do ESP32.
+                    </div>
+                </div>
 
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Laboratório Interativo de Algoritmos
-            </summary>
+                        Laboratório Interativo de Algoritmos
+                    </summary>
 
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Execute uma comparação entre Selection Sort e Merge Sort
-                utilizando dados simulados de BPM.
-            </p>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Execute uma comparação entre Selection Sort e Merge Sort
+                        utilizando dados simulados de BPM.
+                    </p>
 
-            <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
-                <div>
-                    <label for="quantidadeAlgoritmos" style="display: block; margin-bottom: 0.5rem;">
-                        Quantidade de medições
-                    </label>
+                    <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                        <div>
+                            <label for="quantidadeAlgoritmos" style="display: block; margin-bottom: 0.5rem;">
+                                Quantidade de medições
+                            </label>
 
-                    <select id="quantidadeAlgoritmos" style="padding: 0.7rem; background: #0f172a;
+                            <select id="quantidadeAlgoritmos" style="padding: 0.7rem; background: #0f172a;
                            color: white; border: 1px solid var(--card-border);
                            border-radius: 6px;">
-                        <option value="10">10 medições</option>
-                        <option value="100">100 medições</option>
-                        <option value="500">500 medições</option>
-                        <option value="1000">1.000 medições</option>
-                        <option value="5000">5.000 medições</option>
-                    </select>
-                </div>
+                                <option value="10">10 medições</option>
+                                <option value="100">100 medições</option>
+                                <option value="500">500 medições</option>
+                                <option value="1000">1.000 medições</option>
+                                <option value="5000">5.000 medições</option>
+                            </select>
+                        </div>
 
-                <button type="button" onclick="executarLaboratorioAlgoritmos()" style="background: var(--accent-blue); color: #00111f;
+                        <button type="button" onclick="executarLaboratorioAlgoritmos()" style="background: var(--accent-blue); color: #00111f;
                        padding: 0.75rem 1.2rem; border: none;
                        border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Executar comparação
-                </button>
-            </div>
+                            Executar comparação
+                        </button>
+                    </div>
 
-            <div id="resultadoLaboratorio" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
-                Escolha uma quantidade de medições e execute o experimento.
-            </div>
+                    <div id="resultadoLaboratorio" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Escolha uma quantidade de medições e execute o experimento.
+                    </div>
 
-            <div id="graficoLaboratorioContainer" style="display: none; margin-top: 1.5rem;">
+                    <div id="graficoLaboratorioContainer" style="display: none; margin-top: 1.5rem;">
 
-                <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
-                    Comparação executada no navegador
-                </h3>
+                        <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
+                            Comparação executada no navegador
+                        </h3>
 
-                <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                    Quantidade de comparações realizadas pelos algoritmos
-                    na execução selecionada.
-                </p>
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                            Quantidade de comparações realizadas pelos algoritmos
+                            na execução selecionada.
+                        </p>
 
-                <div style="position: relative; height: 280px; width: 100%;">
-                    <canvas id="graficoLaboratorio"></canvas>
-                </div>
+                        <div style="position: relative; height: 280px; width: 100%;">
+                            <canvas id="graficoLaboratorio"></canvas>
+                        </div>
 
-            </div>
+                    </div>
 
-        </details>
+                </details>
 
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Recursividade e Teorema Mestre
-            </summary>
+                        Recursividade e Teorema Mestre
+                    </summary>
 
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Observe como o Merge Sort divide um problema em partes
-                menores e como cresce sua profundidade recursiva.
-            </p>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Observe como o Merge Sort divide um problema em partes
+                        menores e como cresce sua profundidade recursiva.
+                    </p>
 
-            <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
-                <div>
-                    <label for="quantidadeRecursao" style="display: block; margin-bottom: 0.5rem;">
-                        Quantidade de elementos
-                    </label>
+                    <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                        <div>
+                            <label for="quantidadeRecursao" style="display: block; margin-bottom: 0.5rem;">
+                                Quantidade de elementos
+                            </label>
 
-                    <select id="quantidadeRecursao" style="padding: 0.7rem; background: #0f172a;
+                            <select id="quantidadeRecursao" style="padding: 0.7rem; background: #0f172a;
                            color: white; border: 1px solid var(--card-border);
                            border-radius: 6px;">
-                        <option value="8">8 elementos</option>
-                        <option value="16">16 elementos</option>
-                        <option value="32">32 elementos</option>
-                        <option value="64">64 elementos</option>
-                        <option value="128">128 elementos</option>
-                        <option value="256">256 elementos</option>
-                        <option value="512">512 elementos</option>
-                        <option value="1024">1.024 elementos</option>
-                    </select>
-                </div>
+                                <option value="8">8 elementos</option>
+                                <option value="16">16 elementos</option>
+                                <option value="32">32 elementos</option>
+                                <option value="64">64 elementos</option>
+                                <option value="128">128 elementos</option>
+                                <option value="256">256 elementos</option>
+                                <option value="512">512 elementos</option>
+                                <option value="1024">1.024 elementos</option>
+                            </select>
+                        </div>
 
-                <button type="button" onclick="executarAnaliseRecursao()" style="background: var(--accent-blue); color: #00111f;
+                        <button type="button" onclick="executarAnaliseRecursao()" style="background: var(--accent-blue); color: #00111f;
                        padding: 0.75rem 1.2rem; border: none;
                        border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Analisar recursividade
-                </button>
-            </div>
+                            Analisar recursividade
+                        </button>
+                    </div>
 
-            <div id="resultadoRecursao" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
-                Selecione uma quantidade de elementos para iniciar a análise.
-            </div>
-        </details>
+                    <div id="resultadoRecursao" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Selecione uma quantidade de elementos para iniciar a análise.
+                    </div>
+                </details>
 
-        <!-- LABORATÓRIO DE COMPLEXIDADE ESPACIAL -->
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <!-- LABORATÓRIO DE COMPLEXIDADE ESPACIAL -->
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Análise de Complexidade Espacial
-            </summary>
+                        Análise de Complexidade Espacial
+                    </summary>
 
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Compare a memória auxiliar necessária para o Selection Sort
-                no próprio array e para o Merge Sort com buffer.
-            </p>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Compare a memória auxiliar necessária para o Selection Sort
+                        no próprio array e para o Merge Sort com buffer.
+                    </p>
 
-            <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
-                <div>
-                    <label for="quantidadeMemoria" style="display: block; margin-bottom: 0.5rem;">
-                        Quantidade de elementos
-                    </label>
+                    <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                        <div>
+                            <label for="quantidadeMemoria" style="display: block; margin-bottom: 0.5rem;">
+                                Quantidade de elementos
+                            </label>
 
-                    <select id="quantidadeMemoria" style="padding: 0.7rem; background: #0f172a;
+                            <select id="quantidadeMemoria" style="padding: 0.7rem; background: #0f172a;
                            color: white; border: 1px solid var(--card-border);
                            border-radius: 6px;">
-                        <option value="10">10 elementos</option>
-                        <option value="100">100 elementos</option>
-                        <option value="1000">1.000 elementos</option>
-                        <option value="10000">10.000 elementos</option>
-                    </select>
-                </div>
+                                <option value="10">10 elementos</option>
+                                <option value="100">100 elementos</option>
+                                <option value="1000">1.000 elementos</option>
+                                <option value="10000">10.000 elementos</option>
+                            </select>
+                        </div>
 
-                <button type="button" onclick="executarAnaliseMemoria()" style="background: var(--accent-blue); color: #00111f;
+                        <button type="button" onclick="executarAnaliseMemoria()" style="background: var(--accent-blue); color: #00111f;
                        padding: 0.75rem 1.2rem; border: none;
                        border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Analisar memória
-                </button>
-            </div>
+                            Analisar memória
+                        </button>
+                    </div>
 
-            <div id="resultadoMemoria" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
-                Selecione uma quantidade de elementos e execute a análise.
-            </div>
-        </details>
+                    <div id="resultadoMemoria" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Selecione uma quantidade de elementos e execute a análise.
+                    </div>
+                </details>
 
-        <!-- LABORATÓRIO DE INTRATABILIDADE - AULAS 7 E 8 -->
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <!-- LABORATÓRIO DE INTRATABILIDADE - AULAS 7 E 8 -->
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Classes P, NP e Intratabilidade
-            </summary>
+                        Classes P, NP e Intratabilidade
+                    </summary>
 
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Investigue o problema Subset Sum: existe um subconjunto
-                de valores cuja soma é igual ao alvo?
-            </p>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Investigue o problema Subset Sum: existe um subconjunto
+                        de valores cuja soma é igual ao alvo?
+                    </p>
 
-            <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
-                <div>
-                    <label for="quantidadeIntratabilidade" style="display: block; margin-bottom: 0.5rem;">
-                        Quantidade de elementos
-                    </label>
+                    <div style="display: flex; gap: 1rem; align-items: end; flex-wrap: wrap;">
+                        <div>
+                            <label for="quantidadeIntratabilidade" style="display: block; margin-bottom: 0.5rem;">
+                                Quantidade de elementos
+                            </label>
 
-                    <select id="quantidadeIntratabilidade" style="padding: 0.7rem; background: #0f172a;
+                            <select id="quantidadeIntratabilidade" style="padding: 0.7rem; background: #0f172a;
                            color: white; border: 1px solid var(--card-border);
                            border-radius: 6px;">
-                        <option value="8">8 elementos</option>
-                        <option value="12">12 elementos</option>
-                        <option value="16">16 elementos</option>
-                        <option value="18">18 elementos</option>
-                    </select>
-                </div>
+                                <option value="8">8 elementos</option>
+                                <option value="12">12 elementos</option>
+                                <option value="16">16 elementos</option>
+                                <option value="18">18 elementos</option>
+                            </select>
+                        </div>
 
-                <button type="button" onclick="executarAnaliseIntratabilidade()" style="background: var(--accent-blue); color: #00111f;
+                        <button type="button" onclick="executarAnaliseIntratabilidade()" style="background: var(--accent-blue); color: #00111f;
                        padding: 0.75rem 1.2rem; border: none;
                        border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    Executar experimento
-                </button>
-            </div>
+                            Executar experimento
+                        </button>
+                    </div>
 
-            <div id="resultadoIntratabilidade" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
-                Selecione uma quantidade de elementos para iniciar.
-            </div>
-        </details>
+                    <div id="resultadoIntratabilidade" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Selecione uma quantidade de elementos para iniciar.
+                    </div>
+                </details>
 
-        <!-- AULA 9: PRECISÃO NUMÉRICA E MODELO BSS -->
-        <details class="card" style="margin-top: 1.5rem;">
-            <summary style="color: var(--accent-blue);
+                <!-- AULA 9: PRECISÃO NUMÉRICA E MODELO BSS -->
+                <details class="card" style="margin-top: 1.5rem;">
+                    <summary style="color: var(--accent-blue);
                     font-size: 1.15rem;
                     font-weight: bold;
                     cursor: pointer;
                     padding: 0.5rem 0;">
-                Complexidade Contínua e Precisão Numérica
-            </summary>
+                        Complexidade Contínua e Precisão Numérica
+                    </summary>
 
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Compare valores decimais com valores arredondados e observe
-                a diferença entre a computação real e o modelo teórico BSS.
-            </p>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Compare valores decimais com valores arredondados e observe
+                        a diferença entre a computação real e o modelo teórico BSS.
+                    </p>
 
-            <button type="button" onclick="executarAnalisePrecisao()" style="background: var(--accent-blue); color: #00111f;
+                    <button type="button" onclick="executarAnalisePrecisao()" style="background: var(--accent-blue); color: #00111f;
                    padding: 0.75rem 1.2rem; border: none;
                    border-radius: 6px; font-weight: bold; cursor: pointer;">
-                Analisar precisão numérica
-            </button>
+                        Analisar precisão numérica
+                    </button>
 
-            <div id="resultadoPrecisao" aria-live="polite" style="margin-top: 1.5rem; color: var(--text-muted);">
-                Clique no botão para executar o experimento.
+                    <div id="resultadoPrecisao" aria-live="polite"
+                        style="margin-top: 1.5rem; color: var(--text-muted);">
+                        Clique no botão para executar o experimento.
+                    </div>
+                </details>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
+                        Resultados dos experimentos de ordenação
+                    </h3>
+
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                        Comparações realizadas nos testes com dados simulados
+                        semelhantes a valores de BPM.
+                    </p>
+
+                    <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
+                        <canvas id="algoritmosChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
+                        Resultados obtidos
+                    </h3>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--card-border);">
+                                    <th style="padding: 10px;">Medições</th>
+                                    <th style="padding: 10px;">Selection Sort</th>
+                                    <th style="padding: 10px;">Merge Sort</th>
+                                    <th style="padding: 10px;">Redução</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 10px;">10</td>
+                                    <td style="padding: 10px;">45</td>
+                                    <td style="padding: 10px;">25</td>
+                                    <td style="padding: 10px;">44,44%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px;">100</td>
+                                    <td style="padding: 10px;">4.950</td>
+                                    <td style="padding: 10px;">556</td>
+                                    <td style="padding: 10px;">88,77%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px;">500</td>
+                                    <td style="padding: 10px;">124.750</td>
+                                    <td style="padding: 10px;">3.940</td>
+                                    <td style="padding: 10px;">96,84%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px;">1.000</td>
+                                    <td style="padding: 10px;">499.500</td>
+                                    <td style="padding: 10px;">8.865</td>
+                                    <td style="padding: 10px;">98,23%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid-cards" style="margin-top: 1.5rem;">
+                    <div class="card">
+                        <h3 style="color: var(--accent-blue);">Classes P e NP</h3>
+                        <p style="margin-top: 1rem; color: var(--text-muted);">
+                            Estudo do problema Subset Sum, verificação de soluções
+                            e comparação com programação dinâmica.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="color: var(--accent-blue);">Intratabilidade</h3>
+                        <p style="margin-top: 1rem; color: var(--text-muted);">
+                            Experimento com busca exaustiva, demonstrando
+                            crescimento exponencial de 2 elevado a n.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="color: var(--accent-blue);">Complexidade Contínua</h3>
+                        <p style="margin-top: 1rem; color: var(--text-muted);">
+                            Análise do arredondamento, precisão numérica
+                            e comparação teórica com o modelo BSS.
+                        </p>
+                    </div>
+                </div>
             </div>
-        </details>
 
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
-                Resultados dos experimentos de ordenação
-            </h3>
-
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                Comparações realizadas nos testes com dados simulados
-                semelhantes a valores de BPM.
-            </p>
-
-            <div class="chart-container" style="position: relative; height: 320px; width: 100%;">
-                <canvas id="algoritmosChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card" style="margin-top: 1.5rem;">
-            <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">
-                Resultados obtidos
-            </h3>
-
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid var(--card-border);">
-                            <th style="padding: 10px;">Medições</th>
-                            <th style="padding: 10px;">Selection Sort</th>
-                            <th style="padding: 10px;">Merge Sort</th>
-                            <th style="padding: 10px;">Redução</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding: 10px;">10</td>
-                            <td style="padding: 10px;">45</td>
-                            <td style="padding: 10px;">25</td>
-                            <td style="padding: 10px;">44,44%</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px;">100</td>
-                            <td style="padding: 10px;">4.950</td>
-                            <td style="padding: 10px;">556</td>
-                            <td style="padding: 10px;">88,77%</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px;">500</td>
-                            <td style="padding: 10px;">124.750</td>
-                            <td style="padding: 10px;">3.940</td>
-                            <td style="padding: 10px;">96,84%</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px;">1.000</td>
-                            <td style="padding: 10px;">499.500</td>
-                            <td style="padding: 10px;">8.865</td>
-                            <td style="padding: 10px;">98,23%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="grid-cards" style="margin-top: 1.5rem;">
-            <div class="card">
-                <h3 style="color: var(--accent-blue);">Classes P e NP</h3>
-                <p style="margin-top: 1rem; color: var(--text-muted);">
-                    Estudo do problema Subset Sum, verificação de soluções
-                    e comparação com programação dinâmica.
-                </p>
-            </div>
-
-            <div class="card">
-                <h3 style="color: var(--accent-blue);">Intratabilidade</h3>
-                <p style="margin-top: 1rem; color: var(--text-muted);">
-                    Experimento com busca exaustiva, demonstrando
-                    crescimento exponencial de 2 elevado a n.
-                </p>
-            </div>
-
-            <div class="card">
-                <h3 style="color: var(--accent-blue);">Complexidade Contínua</h3>
-                <p style="margin-top: 1rem; color: var(--text-muted);">
-                    Análise do arredondamento, precisão numérica
-                    e comparação teórica com o modelo BSS.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    </main>
+        </main>
     </div>
 
     <script src="/modulos/ordenacao_registros.js"></script>

@@ -827,3 +827,109 @@ select:focus {
         animation: none !important;
     }
 }
+
+
+/* BIOIOT EXPERIENCE — MODO APRESENTAÇÃO */
+
+.gemeo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.gemeo-acoes {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-apresentacao,
+.btn-sair-apresentacao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 1px solid #38bdf8;
+    font-weight: 700;
+    cursor: pointer;
+    background: #123047;
+    color: #e0f2fe;
+}
+
+.btn-apresentacao:hover,
+.btn-sair-apresentacao:hover {
+    background: #164766;
+}
+
+.btn-apresentacao svg,
+.btn-sair-apresentacao svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-apresentacao[hidden],
+.btn-sair-apresentacao[hidden] {
+    display: none !important;
+}
+
+/* Quando o Modo Apresentação estiver ativo */
+
+body.modo-apresentacao .sidebar {
+    display: none;
+}
+
+body.modo-apresentacao .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 24px 36px;
+}
+
+body.modo-apresentacao .top-bar {
+    display: none !important;
+}
+
+body.modo-apresentacao #gemeo-digital {
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+body.modo-apresentacao #gemeo-digital h1 {
+    font-size: 2.5rem;
+}
+
+body.modo-apresentacao .gemeo-heart-stage {
+    min-height: 380px;
+}
+
+body.modo-apresentacao .anatomical-heart-shell {
+    width: 300px;
+    height: 300px;
+}
+
+body.modo-apresentacao .anatomical-heart-svg {
+    width: 280px;
+    height: 280px;
+}
+
+body.modo-apresentacao .gemeo-metric-box strong {
+    font-size: 36px;
+}
+
+body.modo-apresentacao .fluxo-etapa {
+    min-height: 175px;
+}
+
+@media (max-width: 700px) {
+    body.modo-apresentacao .main-content {
+        padding: 16px;
+    }
+
+    body.modo-apresentacao #gemeo-digital h1 {
+        font-size: 1.8rem;
+    }
+}
