@@ -225,12 +225,7 @@ this.aguardarFila = function (callback) {
         leituraId: 2002
     });
 
-    await new Promise((resolve, reject) => {
-        db.get('SELECT 1', erro => {
-            if (erro) reject(erro);
-            else resolve();
-        });
-    });
+    await aguardarFila();
 
     const atencaoAnterior = await consultar(
         `SELECT * FROM alarmes WHERE leitura_id = 2001`

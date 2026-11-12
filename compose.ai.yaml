@@ -1,0 +1,24 @@
+services:
+  ia:
+    build:
+      context: ./bioiot-ai
+      dockerfile: Dockerfile.ia
+
+    restart: unless-stopped
+
+    environment:
+      BIOIOT_AI_PORT: "8001"
+
+    expose:
+      - "8001"
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

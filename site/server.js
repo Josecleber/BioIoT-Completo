@@ -385,6 +385,8 @@ app.post('/api/monitoramento/encerrar', (req, res) => {
 
     dispositivosEncerrandoMonitoramento.add(dispositivo);
 
+    coletorIA.limpar(dispositivo);
+
     function finalizarMonitoramento() {
         pacientesEmMonitoramento.delete(dispositivo);
         sessoesEmMonitoramento.delete(dispositivo);
@@ -960,6 +962,31 @@ function confirmarAlarmeServidor(
     return null;
 }
 
+const { criarColetorIA } = require("./ia_coletor");
+const coletorIA = criarColetorIA();
+
+
+app.get("/api/ia/estado/:dispositivo", (req, res) => {
+    const dispositivo = req.params.dispositivo;
+
+    if (
+        typeof dispositivo !== "string" ||
+        dispositivo.length === 0 ||
+        dispositivo.length > 100
+    ) {
+        return res.status(400).json({
+            erro: "Dispositivo inválido."
+        });
+    }
+
+    res.set("Cache-Control", "no-store");
+
+    return res.json({
+        dispositivo,
+        ...coletorIA.obter(dispositivo)
+    });
+});
+
 app.post('/api/dados', (req, res) => {
     const { dispositivo, bpm, spo2, sessaoId } = req.body;
     estatisticasComunicacao.medicoesRecebidas++;
@@ -1030,6 +1057,8 @@ app.post('/api/dados', (req, res) => {
     }
 
     if (bpm <= 0) {
+        coletorIA.pausar(dispositivo);
+
         confirmacoesAlarmesServidor.delete(dispositivo);
 
         if (sessaoAtiva) {
@@ -1049,7 +1078,7 @@ app.post('/api/dados', (req, res) => {
     if (pacienteId === null || sessaoAtiva === null) {
         // MODO LIVRE: Aceita os dados para o gráfico, mas NÃO salva no SQLite
         estatisticasComunicacao.medicoesAceitas++;
-        
+
         estadosUI[dispositivo] = {
             id: Date.now(),
             paciente_id: null,
@@ -1058,9 +1087,17 @@ app.post('/api/dados', (req, res) => {
             recebidaEm: Date.now()
         };
 
-        return res.status(201).json({ 
-            status: 'Modo Livre (Não Salvo no Histórico)', 
-            leituraId: null 
+        coletorIA.receber({
+            dispositivo,
+            sessaoId: "",
+            bpm,
+            spo2,
+            instante: Date.now()
+        });
+
+        return res.status(201).json({
+            status: 'Modo Livre (Não Salvo no Histórico)',
+            leituraId: null
         });
     }
 
@@ -1151,6 +1188,14 @@ app.post('/api/dados', (req, res) => {
         console.log(
             `[IoT Saúde] Disp: ${dispositivo} | BPM: ${bpm} | SpO2: ${spo2}%`
         );
+
+        coletorIA.receber({
+            dispositivo,
+            sessaoId: sessaoAtiva,
+            bpm,
+            spo2,
+            instante: Date.now()
+        });
 
         res.status(201).json({
             status: 'Sucesso',

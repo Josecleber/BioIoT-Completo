@@ -15,7 +15,7 @@ const inicio = codigoServidor.indexOf(
 );
 
 const fim = codigoServidor.indexOf(
-    "app.post('/api/dados'",
+    'const { criarColetorIA }',
     inicio
 );
 

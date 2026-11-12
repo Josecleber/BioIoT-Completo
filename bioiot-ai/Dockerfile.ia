@@ -1,0 +1,11 @@
+FROM python:3.12-slim
+WORKDIR /workspace
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
+COPY api_ia.py teste_api_ia.py ./
+COPY modelos/bioiot_isolation_forest.joblib ./modelos/bioiot_isolation_forest.joblib
+COPY modelos/bioiot_isolation_forest_esp32.joblib ./modelos/bioiot_isolation_forest_esp32.joblib
+COPY resultados/catalogo_interativo.json ./resultados/catalogo_interativo.json
+USER 65534:65534
+EXPOSE 8001
+CMD ["python", "api_ia.py"]
